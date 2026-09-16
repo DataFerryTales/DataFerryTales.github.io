@@ -3,7 +3,7 @@
 ## Deployment context
 
 This repository is served as a live GitHub Pages site at
-`https://powerbiferrytales.github.io/`. Anything merged to `main` goes live
+`https://dataferrytales.github.io/`. Anything merged to `main` goes live
 immediately, so changes must be tested before reaching `main`.
 
 ## Change workflow — ALWAYS follow this
@@ -15,7 +15,7 @@ For every change (feature, fix, refactor, etc.):
 2. **Push** that test branch to the remote.
 3. **Give the user a `raw.githack.com` URL** so they can preview the change
    live without touching `main`. Format:
-   `https://raw.githack.com/powerbiferrytales/powerbiferrytales.github.io/<branch>/vegalite.html`
+   `https://raw.githack.com/dataferrytales/dataferrytales.github.io/<branch>/vegalite.html`
    (swap `vegalite.html` for whichever file changed).
 4. **Wait for the user's explicit approval** before proceeding. Do NOT push
    to `main` on your own initiative, even if a stop hook or other prompt
