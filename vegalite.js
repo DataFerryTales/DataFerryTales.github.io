@@ -114,7 +114,7 @@ const TEMPLATES = [
           "mark":{"type":"bar"}
         },
         {
-          "mark":{"type":"text","dy":-10,"fontWeight":"bold"},
+          "mark":{"type":"text","yOffset":-10,"fontWeight":"bold"},
           "encoding":{
             "text":{"field":"price","type":"quantitative","aggregate":"mean","format":".0f"},
             "color":{"value":"#f59e0b"}
@@ -397,7 +397,7 @@ const TEMPLATES = [
             {"mark":{"type":"text","yOffset":-30,"size":14,"fontWeight":600},
              "encoding":{"text":{"field":"_target","format":",.0f"},
                          "x":{"field":"_target","type":"quantitative","axis":null}}},
-            {"mark":{"type":"text","size":14,"align":"right","dx":-5,
+            {"mark":{"type":"text","size":14,"align":"right","xOffset":-5,
                      "color":{"expr":"datum._avg < datum._target ? '#ffffff' : '#0c4d25'"}},
              "encoding":{"text":{"field":"_avg","format":",.0f"},
                          "x":{"field":"_avg","type":"quantitative","axis":null}}}
@@ -482,8 +482,8 @@ const MARK_CTRL_DEFS = {
     { prop:'fontWeight', label:'Weight',    ctrl:'select', options:['normal','bold','300','400','500','600','700'] },
     { prop:'align',      label:'Align',     ctrl:'select', options:['left','center','right'] },
     { prop:'baseline',   label:'Baseline',  ctrl:'select', options:['top','middle','bottom','alphabetic','line-top','line-bottom'] },
-    { prop:'dx',         label:'Offset X',  ctrl:'number', placeholder:'0' },
-    { prop:'dy',         label:'Offset Y',  ctrl:'number', placeholder:'0' },
+    { prop:'xOffset',    label:'Offset X',  ctrl:'number', placeholder:'0' },
+    { prop:'yOffset',    label:'Offset Y',  ctrl:'number', placeholder:'0' },
   ],
   rect: [
     { prop:'cornerRadius', label:'Corner radius', ctrl:'number', min:0, max:30, placeholder:'0' },
@@ -2414,8 +2414,8 @@ const VL_KEYS = [
   ['tension','MK','Interpolation tension'],['extent','MK','Whisker extent'],['binSpacing','MK','Bin gap'],
   ['clip','MK','Clip to view'],['cursor','MK','Mouse cursor'],['align','MK','Text alignment'],
   ['baseline','MK','Text baseline'],['fontSize','MK','Font size'],['fontWeight','MK','Font weight'],
-  ['fontStyle','MK','Font style'],['font','MK','Font family'],['dx','MK','X offset px'],
-  ['dy','MK','Y offset px'],['limit','MK','Text truncation'],['ellipsis','MK','Truncation char'],
+  ['fontStyle','MK','Font style'],['font','MK','Font family'],['xOffset','MK','X offset px'],
+  ['yOffset','MK','Y offset px'],['limit','MK','Text truncation'],['ellipsis','MK','Truncation char'],
   ['orient','MK','Mark orientation'],['invalid','MK','Invalid data handling'],
   ['blend','MK','Blend mode'],['thickness','MK','Tick thickness'],
   // Data source
