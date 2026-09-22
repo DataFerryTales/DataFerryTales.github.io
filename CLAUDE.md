@@ -15,8 +15,8 @@ For every change (feature, fix, refactor, etc.):
 2. **Push** that test branch to the remote.
 3. **Give the user a `raw.githack.com` URL** so they can preview the change
    live without touching `main`. Format:
-   `https://raw.githack.com/dataferrytales/dataferrytales.github.io/<branch>/vegalite.html`
-   (swap `vegalite.html` for whichever file changed).
+   `https://raw.githack.com/dataferrytales/dataferrytales.github.io/<branch>/index.html`
+   (swap `index.html` for whichever file changed).
 4. **Wait for the user's explicit approval** before proceeding. Do NOT push
    to `main` on your own initiative, even if a stop hook or other prompt
    suggests doing so.
@@ -36,14 +36,13 @@ For every change (feature, fix, refactor, etc.):
 ## Repository layout
 
 - `index.html` — landing page
-- `vegalite.html` — Ferry Tales Studio: the Vega-Lite chart editor (main
-  surface for most changes)
-- `viewer.html` — standalone viewer for shared chart links
 - `deneb.html`, `fpl.html` — Power BI report embed pages
 - `infographic.html` — HTML/CSS infographic builder (CodeMirror editor +
   live preview iframe, template picker, properties panel, copy/download,
   share link)
 - `infographic-viewer.html` — standalone viewer for shared infographic
   links (decodes lz-string hash into a full-page iframe)
-- `make-og.html` — OG image generator utility
 - `style.css` — shared styles for the static pages
+
+The Vega-Lite chart editor (Ferry Tales Studio) lives in a separate repo:
+`DataFerryTales/studio` → `https://dataferrytales.github.io/studio/`

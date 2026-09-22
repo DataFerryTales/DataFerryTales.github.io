@@ -1,10 +1,6 @@
 # Ignore everything except site files
 *
 !index.html
-!vegalite.html
-!vegalite.css
-!vegalite.js
-!make-og.html
 !infographic.html
 !infographic-viewer.html
 !data/
@@ -14,7 +10,6 @@
 !cv/index.html
 !deneb.html
 !fpl.html
-!viewer.html
 !privacy.html
 !style.css
 !CLAUDE.md
