@@ -164,15 +164,15 @@
 
     /* ── Print / PDF ── */
     @media print{
-      body{background:#fff;font-size:11px}
+      body{background:#fff;font-size:11.5px}
       .topbar,.progress{display:none}
       .sheet{border:none;max-width:none;margin:0;padding:0 5mm}
       section{margin-top:20px}
       .masthead{margin-bottom:18px;padding-bottom:16px}
       h2{break-after:avoid;margin-bottom:12px;padding-bottom:5px}
       .profile p{margin-bottom:7px}
-      .entry{margin-bottom:14px}
-      .entry,.talk,.skill-group{break-inside:avoid}
+      .entry{margin-bottom:14px;break-inside:auto}
+      .talk,.skill-group,.now .entry{break-inside:avoid}
       .skill-group{margin-bottom:8px}
       .talk{padding:5px 0}
       .now .entry{border:none;border-radius:0;padding:0;margin-bottom:13px}
