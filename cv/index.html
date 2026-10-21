@@ -134,7 +134,7 @@
     /* ── Two-up footer sections ── */
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:30px}
     .pill-list{display:flex;flex-wrap:wrap;gap:6px}
-    .footer .interests{color:var(--muted);margin-top:8px}
+    .footer .interests{margin-top:8px}
     .note{color:var(--muted);font-size:.85rem;font-style:italic;margin-top:10px}
 
     /* ── Website-feel touches (screen only) ── */
@@ -490,7 +490,7 @@
       const about = cv.about ? `<p>${esc(cv.about)}</p>` : '';
       const interests = cv.interests ? `<p class="interests">${esc(cv.interests)}</p>` : '';
       if(!about && !interests) return '';
-      return `<div class="footer"><section style="margin-top:0"><h2>About</h2>${about}${interests}</section></div>`;
+      return `<div class="footer"><section><h2>About</h2>${about}${interests}</section></div>`;
     }
 
     function render(cv){
