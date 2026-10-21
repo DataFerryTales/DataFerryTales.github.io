@@ -226,24 +226,24 @@
   ],
   "now": [
     {
-      "name": "Data Ferry Tales, open site & tooling",
-      "blurb": "My open site and toolkit, published via GitHub Pages: a Vega-Lite chart builder, an HTML/CSS infographic builder, custom chart templates, and zero-backend share links (state lz-string-encoded straight into the URL). The home for my data-visualisation experiments.",
-      "tags": ["Vega-Lite", "Deneb", "HTML / CSS / JS", "lz-string", "GitHub Pages"]
+      "name": "Ferry Tales Vega-Lite Studio",
+      "blurb": "A browser-based studio for designing data visualisations and infographic mock-ups. Build a visual, then export the image to share, or the code to drop straight into Power BI or Databricks, or to give the AI tool of your choosing a stronger starting point. My home for data-visualisation experiments.",
+      "tags": ["Vega-Lite", "Deneb", "HTML / CSS / JS", "GitHub Pages"]
     },
     {
       "name": "Gaffer, Fantasy Premier League app",
-      "blurb": "A native Android app for FPL managers, in public testing on Google Play: fixture-difficulty heatmaps, a chip-timing advisor and simulator, mini-league chip tracking, rivals head-to-head analysis, and branded, shareable squad and head-to-head cards. Zero-backend, built on the public FPL API with on-device storage.",
+      "blurb": "A native Android app for Fantasy Premier League managers, in public testing on Google Play. Plan your chips with a timing advisor and simulator, read the fixtures through difficulty heatmaps, track your mini-league and size up rivals head-to-head, then share a branded squad card. No backend: just the public FPL API and on-device storage.",
       "tags": ["Kotlin", "Jetpack Compose", "Android", "Google Play", "REST APIs"]
     },
     {
       "name": "Fabric Data App",
-      "blurb": "Microsoft Fabric Analytics web apps (React / Vite) that read live semantic models and embed natively in the Fabric portal, exploring the new Fabric app-development model.",
+      "blurb": "Native web apps for Microsoft Fabric that turn a live semantic model into a tailored, interactive analytics app, embedded straight into the Fabric portal. Built with React and Vite to explore the new Fabric app-development model.",
       "tags": ["Microsoft Fabric", "React", "Vite", "Semantic models"]
     },
     {
       "name": "Kayak Spots",
       "link": "https://dataferrytales.github.io/kayak-spots/",
-      "blurb": "An interactive map of over 3,600 kayak launch and take-out spots across Germany and Europe, published as an installable web app (PWA). The spot data is enriched from OpenStreetMap with Python.",
+      "blurb": "An installable web app mapping over 3,600 kayak launch and take-out spots across Germany and Europe. Find your next put-in, with spot data enriched from OpenStreetMap using Python. Equal parts data project and excuse to get on the water.",
       "tags": ["Leaflet", "OpenStreetMap", "Python", "PWA", "GitHub Pages"]
     }
   ],
@@ -411,7 +411,7 @@
 
     function nowSection(items){
       if(!items || !items.length) return '';
-      return `<section class="now"><h2>Now / Building</h2>${items.map(p=>{
+      return `<section class="now"><h2>Personal Projects</h2>${items.map(p=>{
         const title = p.link
           ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.name)} <span class="ext" aria-hidden="true">↗</span></a>`
           : esc(p.name);
@@ -518,7 +518,7 @@
     }
 
     const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-    const NAV_LABELS = { 'now-building':'Building', 'certifications':'Certs', 'community-content':'Community', 'education-about':'Education' };
+    const NAV_LABELS = { 'personal-projects':'Projects', 'certifications':'Certs', 'community-content':'Community', 'education-about':'Education' };
 
     function enhance(){
       const cvEl = document.getElementById('cv');
