@@ -217,6 +217,14 @@
 
     .post-body a { color: var(--cyan); }
 
+    .post-body code {
+      font-family: 'BlockZone', 'VT323', monospace;
+      color: var(--dos-blue);
+      background: var(--cyan);
+      padding: 0 6px;
+      text-shadow: none;
+    }
+
     .post-body h3 {
       color: var(--cyan);
       font-size: 1.6rem;
@@ -405,10 +413,34 @@
   <!-- ── Timeline navigation (one <li> per post, newest first) ── -->
   <ul class="timeline" id="timeline">
     <li class="timeline-head">ENTRIES</li>
+    <li data-target="post-vega-builder">
+      <a href="#post-vega-builder">
+        Shipping the Vega-Lite Builder
+        <span class="tl-date">10 Nov 2026</span>
+      </a>
+    </li>
+    <li data-target="post-deneb-gradients">
+      <a href="#post-deneb-gradients">
+        Gradient fills in Deneb
+        <span class="tl-date">3 Nov 2026</span>
+      </a>
+    </li>
+    <li data-target="post-fpl-xg">
+      <a href="#post-fpl-xg">
+        An xG table for FPL
+        <span class="tl-date">24 Oct 2026</span>
+      </a>
+    </li>
+    <li data-target="post-kayak-map">
+      <a href="#post-kayak-map">
+        Mapping my kayak spots
+        <span class="tl-date">9 Oct 2026</span>
+      </a>
+    </li>
     <li data-target="post-hello-world">
       <a href="#post-hello-world">
         Hello, world
-        <span class="tl-date">12 Nov 2026</span>
+        <span class="tl-date">1 Oct 2026</span>
       </a>
     </li>
   </ul>
@@ -416,14 +448,84 @@
   <!-- ── Posts (newest first). To add a post, paste a new <article> at the top. ── -->
   <div class="posts" id="posts">
 
+    <!-- ==== POST TEMPLATE START (newest entry — keep the cursor on this one) ==== -->
+    <article class="post" id="post-vega-builder">
+      <div class="post-date">10 November 2026</div>
+      <h2>Shipping the Vega-Lite Builder</h2>
+      <div class="post-body">
+        <p>After a few late nights, the Vega-Lite Builder is finally live in the Studio. The idea was simple: let people point, click and drag their way to a chart spec without hand-writing a single line of JSON.</p>
+        <p>It turns out "simple" is doing a lot of work in that sentence. Encoding channels, scales, and the thousand little defaults that make a chart feel right &mdash; each one needed a sensible fallback so the preview never breaks while you tinker.</p>
+        <p>If you give it a spin and something feels off, I genuinely want to hear about it. The whole point is to lower the barrier between "I have some data" and "I have a chart I'm proud of."<span class="cursor" aria-hidden="true"></span></p>
+      </div>
+      <!-- Share toolbar (same markup in every post; JS wires it to this article) -->
+      <div class="post-tools">
+        <button class="tool-btn" data-act="link">&#128279; Copy link</button>
+        <button class="tool-btn" data-act="image">&#128247; Save image</button>
+        <button class="tool-btn" data-act="linkedin">in Share</button>
+        <button class="tool-btn" data-act="bluesky">&#9729; Bluesky</button>
+        <button class="tool-btn" data-act="x">&#120143; Post</button>
+      </div>
+    </article>
+
+    <article class="post" id="post-deneb-gradients">
+      <div class="post-date">3 November 2026</div>
+      <h2>Gradient fills in Deneb</h2>
+      <div class="post-body">
+        <p>Someone asked this week whether you can do proper gradient fills in Deneb. Short answer: yes, and they look lovely when used with restraint.</p>
+        <p>The trick is a linear gradient definition in the mark's <code>fill</code>, with stops tied to a field or just a fixed pair of colours. I'll usually keep it to a single hue stepping from light to dark &mdash; a rainbow gradient on a bar chart is a fast way to make a beautiful chart that says nothing.</p>
+        <h3>A quick rule of thumb</h3>
+        <p>If the gradient encodes a value, make sure the legend explains it. If it's purely decorative, keep it subtle enough that nobody mistakes it for data.</p>
+      </div>
+      <div class="post-tools">
+        <button class="tool-btn" data-act="link">&#128279; Copy link</button>
+        <button class="tool-btn" data-act="image">&#128247; Save image</button>
+        <button class="tool-btn" data-act="linkedin">in Share</button>
+        <button class="tool-btn" data-act="bluesky">&#9729; Bluesky</button>
+        <button class="tool-btn" data-act="x">&#120143; Post</button>
+      </div>
+    </article>
+
+    <article class="post" id="post-fpl-xg">
+      <div class="post-date">24 October 2026</div>
+      <h2>An xG table for FPL</h2>
+      <div class="post-body">
+        <p>Gameweek after gameweek I keep coming back to the same question: is this striker actually good, or just lucky? Expected goals (xG) is the cleanest way I've found to tell the difference, so I built a little table that lines up each player's goals against their xG.</p>
+        <p>The players sitting well above their xG line are the ones to watch for a regression &mdash; the fairy tale usually ends. The ones below it, quietly racking up chances without the end product, are often the better transfer in.</p>
+        <p>It's not gospel. But over a season it's been a far better guide than the back pages.</p>
+      </div>
+      <div class="post-tools">
+        <button class="tool-btn" data-act="link">&#128279; Copy link</button>
+        <button class="tool-btn" data-act="image">&#128247; Save image</button>
+        <button class="tool-btn" data-act="linkedin">in Share</button>
+        <button class="tool-btn" data-act="bluesky">&#9729; Bluesky</button>
+        <button class="tool-btn" data-act="x">&#120143; Post</button>
+      </div>
+    </article>
+
+    <article class="post" id="post-kayak-map">
+      <div class="post-date">9 October 2026</div>
+      <h2>Mapping my kayak spots</h2>
+      <div class="post-body">
+        <p>A slightly less data-heavy one. I've started pinning every decent kayak launch I find to a map on this site &mdash; partly so I stop forgetting the good ones, partly as an excuse to play with mapping in the browser.</p>
+        <p>Turns out a surprising amount of the fun is in the little details: a sensible zoom, markers that don't overlap into mush, and a popup that tells you what you actually need to know before you drive an hour with a boat on the roof.</p>
+      </div>
+      <div class="post-tools">
+        <button class="tool-btn" data-act="link">&#128279; Copy link</button>
+        <button class="tool-btn" data-act="image">&#128247; Save image</button>
+        <button class="tool-btn" data-act="linkedin">in Share</button>
+        <button class="tool-btn" data-act="bluesky">&#9729; Bluesky</button>
+        <button class="tool-btn" data-act="x">&#120143; Post</button>
+      </div>
+    </article>
+
     <!-- ==== POST TEMPLATE START ==== -->
     <article class="post" id="post-hello-world">
-      <div class="post-date">12 November 2026</div>
+      <div class="post-date">1 October 2026</div>
       <h2>Hello, world</h2>
       <div class="post-body">
         <p>Welcome to the Data Ferry Tales journal. This is the very first entry &mdash; mostly here so you can see how the page looks and scrolls.</p>
         <p>The idea is simple: one long page, newest entry at the top, with a progress bar along the top and a timeline down the side that lights up whichever entry you're reading.</p>
-        <p>When I've got something new to share, it slots straight in above this one. Thanks for stopping by.<span class="cursor" aria-hidden="true"></span></p>
+        <p>When I've got something new to share, it slots straight in above this one. Thanks for stopping by.</p>
       </div>
       <!-- Share toolbar (same markup in every post; JS wires it to this article) -->
       <div class="post-tools">
