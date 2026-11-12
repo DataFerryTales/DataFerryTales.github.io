@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Journal · Data Ferry Tales</title>
+  <meta name="description" content="Notes on data visualisation, Deneb, Power BI and whatever I'm tinkering with.">
+  <!-- Open Graph / social preview (shown when the link is shared) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Data Ferry Tales">
+  <meta property="og:title" content="Journal · Data Ferry Tales">
+  <meta property="og:description" content="Notes on data visualisation, Deneb, Power BI and whatever I'm tinkering with.">
+  <meta property="og:url" content="https://dataferrytales.github.io/blog.html">
+  <meta property="og:image" content="https://dataferrytales.github.io/avatar.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Journal · Data Ferry Tales">
+  <meta name="twitter:description" content="Notes on data visualisation, Deneb, Power BI and whatever I'm tinkering with.">
+  <meta name="twitter:image" content="https://dataferrytales.github.io/avatar.png">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
@@ -243,6 +255,113 @@
     }
     @keyframes blink { 50% { opacity: 0; } }
 
+    /* ── Text selection colour (highlight looks DOS-native) ── */
+    ::selection { background: var(--cyan); color: var(--dos-blue); text-shadow: none; }
+
+    /* ── Target flash when arriving via a #post-id link ── */
+    .post.flash { animation: flash 1.6s ease-out; }
+    @keyframes flash {
+      0%, 30% { background: rgba(92,240,255,0.18); }
+      100%    { background: transparent; }
+    }
+
+    /* ── Per-post share toolbar ── */
+    .post-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+    }
+
+    .tool-btn {
+      font-family: 'BlockZone', 'VT323', monospace;
+      font-size: 1.05rem;
+      letter-spacing: 1px;
+      color: var(--txt);
+      background: transparent;
+      border: 1px solid var(--dim);
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: color 0.12s, border-color 0.12s, background 0.12s;
+    }
+    .tool-btn:hover { color: var(--dos-blue); background: var(--cyan); border-color: var(--cyan); }
+    .tool-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+    /* ── Floating selection popup ── */
+    .sel-popup {
+      position: absolute;
+      z-index: 220;
+      display: none;
+      gap: 6px;
+      background: var(--dos-blue);
+      border: 1px solid var(--cyan);
+      padding: 5px;
+      box-shadow: 0 0 0 1px var(--dos-blue);
+      white-space: nowrap;
+    }
+    .sel-popup.show { display: flex; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 240;
+      background: var(--dos-blue);
+      border: 1px solid var(--cyan);
+      color: var(--txt);
+      font-size: 1.1rem;
+      padding: 10px 18px;
+      max-width: 90vw;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Off-screen render stage for the shareable image ── */
+    #cardStage {
+      position: fixed;
+      left: -9999px;
+      top: 0;
+      pointer-events: none;
+    }
+
+    /* The shareable "quote card" (rendered to PNG; fixed 1080px for socials) */
+    .share-card {
+      width: 1080px;
+      box-sizing: border-box;
+      padding: 70px 76px;
+      background: var(--dos-blue);
+      color: var(--txt);
+      font-family: 'BlockZone', 'VT323', monospace;
+      position: relative;
+      overflow: hidden;
+    }
+    .share-card .sc-scan {
+      position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.14) 0px, rgba(0,0,0,0.14) 2px,
+        rgba(0,0,0,0)    2px, rgba(0,0,0,0)    5px);
+    }
+    .share-card .sc-top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      color: var(--cyan); font-size: 30px; letter-spacing: 2px;
+      border-bottom: 2px solid var(--dim); padding-bottom: 18px; margin-bottom: 36px;
+    }
+    .share-card .sc-title { color: var(--cyan); font-size: 40px; letter-spacing: 1px; margin-bottom: 8px; }
+    .share-card .sc-date  { color: var(--dim); font-size: 26px; letter-spacing: 2px; margin-bottom: 30px; }
+    .share-card .sc-quote { color: var(--txt); font-size: 52px; line-height: 1.4; }
+    .share-card .sc-quote::before { content: "> "; color: var(--cyan); }
+    .share-card .sc-foot {
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--dim); font-size: 28px; letter-spacing: 2px;
+      border-top: 2px solid var(--dim); padding-top: 22px; margin-top: 44px;
+    }
+    .share-card .sc-foot b { color: var(--cyan); font-weight: 400; }
+
     /* ── Responsive ── */
     @media (max-width: 760px) {
       .blog-wrap { grid-template-columns: 1fr; gap: 24px; }
@@ -254,6 +373,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .cursor { animation: none; }
+      .post.flash { animation: none; }
     }
   </style>
 </head>
@@ -305,6 +425,14 @@
         <p>The idea is simple: one long page, newest entry at the top, with a progress bar along the top and a timeline down the side that lights up whichever entry you're reading.</p>
         <p>When I've got something new to share, it slots straight in above this one. Thanks for stopping by.<span class="cursor" aria-hidden="true"></span></p>
       </div>
+      <!-- Share toolbar (same markup in every post; JS wires it to this article) -->
+      <div class="post-tools">
+        <button class="tool-btn" data-act="link">&#128279; Copy link</button>
+        <button class="tool-btn" data-act="image">&#128247; Save image</button>
+        <button class="tool-btn" data-act="linkedin">in Share</button>
+        <button class="tool-btn" data-act="bluesky">&#9729; Bluesky</button>
+        <button class="tool-btn" data-act="x">&#120143; Post</button>
+      </div>
     </article>
     <!-- ==== POST TEMPLATE END ==== -->
 
@@ -312,8 +440,23 @@
 
 </main>
 
+<!-- Floating popup shown when text is selected -->
+<div class="sel-popup" id="selPopup">
+  <button class="tool-btn" data-act="sel-link">&#128279; Link to text</button>
+  <button class="tool-btn" data-act="sel-image">&#128247; Make image</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Off-screen stage where the shareable card is rendered to a PNG -->
+<div id="cardStage" aria-hidden="true"></div>
+
+<script src="js/html-to-image.js"></script>
 <script>
-  // Scroll progress bar + active-post highlighting
+  /* ══════════════════════════════════════════════════════════
+     1. Scroll progress bar + active-post highlighting
+     ══════════════════════════════════════════════════════════ */
   const bar = document.getElementById('scrollProgress');
   const timelineItems = Array.from(document.querySelectorAll('#timeline li[data-target]'));
   const posts = Array.from(document.querySelectorAll('.post'));
@@ -333,10 +476,224 @@
       li.classList.toggle('active', li.dataset.target === activeId);
     });
   }
-
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
   onScroll();
+
+  /* ══════════════════════════════════════════════════════════
+     2. Sharing helpers
+     ══════════════════════════════════════════════════════════ */
+  const SITE = 'Data Ferry Tales';
+  const HANDLE = 'dataferrytales.github.io';
+  const toastEl = document.getElementById('toast');
+  let toastTimer;
+
+  function toast(msg, ms = 3200) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+  }
+
+  // Canonical page URL (strip any existing hash/fragment)
+  function pageUrl() {
+    return location.origin !== 'null'
+      ? location.origin + location.pathname
+      : location.href.split('#')[0];
+  }
+
+  function postMeta(post) {
+    return {
+      id: post.id,
+      title: (post.querySelector('h2')?.textContent || SITE).trim(),
+      date: (post.querySelector('.post-date')?.textContent || '').trim(),
+      url: pageUrl() + '#' + post.id
+    };
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      // Fallback for older browsers / insecure contexts
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (_) {}
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
+
+  function openShare(url) {
+    window.open(url, '_blank', 'noopener,noreferrer,width=640,height=680');
+  }
+
+  function shareLinkedIn(url) {
+    openShare('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url));
+  }
+  function shareBluesky(text, url) {
+    openShare('https://bsky.app/intent/compose?text=' + encodeURIComponent(text + '\n\n' + url));
+  }
+  function shareX(text, url) {
+    openShare('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url));
+  }
+
+  /* ── Text-fragment deep link: links AND auto-highlights the exact text
+        in Chromium/Edge (falls back to the post anchor elsewhere) ── */
+  function textFragmentUrl(baseUrl, selectedText) {
+    const clean = selectedText.replace(/\s+/g, ' ').trim();
+    if (!clean) return baseUrl;
+    // Keep URLs sane: for long selections, anchor on the first & last few words
+    const words = clean.split(' ');
+    let frag;
+    if (words.length > 12) {
+      const start = words.slice(0, 5).join(' ');
+      const end = words.slice(-5).join(' ');
+      frag = encodeURIComponent(start) + ',' + encodeURIComponent(end);
+    } else {
+      frag = encodeURIComponent(clean);
+    }
+    return baseUrl + '#:~:text=' + frag;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     3. Shareable DOS "quote card" image generator
+     ══════════════════════════════════════════════════════════ */
+  const stage = document.getElementById('cardStage');
+
+  async function makeCardImage({ quote, title, date, filenameHint }) {
+    if (!window.htmlToImage) { toast('Image library still loading — try again in a second.'); return; }
+
+    const card = document.createElement('div');
+    card.className = 'share-card';
+    card.innerHTML =
+      '<div class="sc-top"><span>' + SITE.toUpperCase() + '</span><span>// JOURNAL</span></div>' +
+      (title ? '<div class="sc-title">' + escapeHtml(title) + '</div>' : '') +
+      (date ? '<div class="sc-date">' + escapeHtml(date) + '</div>' : '') +
+      '<div class="sc-quote">' + escapeHtml(quote) + '</div>' +
+      '<div class="sc-foot"><b>' + HANDLE + '</b><span>&#9608;</span></div>' +
+      '<div class="sc-scan"></div>';
+    stage.appendChild(card);
+
+    try {
+      toast('Rendering image…', 2000);
+      // Render at 2x for crisp output on retina / LinkedIn
+      const dataUrl = await window.htmlToImage.toPng(card, {
+        pixelRatio: 2,
+        backgroundColor: '#0000aa',
+        cacheBust: true
+      });
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'ferrytales-' + (filenameHint || 'journal') + '.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      toast('Image saved — attach it to your LinkedIn / Bluesky post.');
+    } catch (e) {
+      console.error(e);
+      toast('Sorry, could not generate the image.');
+    } finally {
+      stage.removeChild(card);
+    }
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function slug(s) {
+    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'journal';
+  }
+
+  function postExcerpt(post, max = 280) {
+    const t = (post.querySelector('.post-body')?.textContent || '').replace(/\s+/g, ' ').trim();
+    return t.length > max ? t.slice(0, max - 1).trim() + '…' : t;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     4. Wire up per-post toolbar buttons
+     ══════════════════════════════════════════════════════════ */
+  document.querySelectorAll('.post-tools').forEach(bar => {
+    const post = bar.closest('.post');
+    bar.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.tool-btn'); if (!btn) return;
+      const m = postMeta(post);
+      const text = m.title + ' — ' + SITE;
+      switch (btn.dataset.act) {
+        case 'link':
+          toast((await copyText(m.url)) ? 'Link copied: ' + m.url : 'Copy failed — here it is: ' + m.url);
+          break;
+        case 'image':
+          makeCardImage({ quote: postExcerpt(post), title: m.title, date: m.date, filenameHint: slug(m.title) });
+          break;
+        case 'linkedin': shareLinkedIn(m.url); break;
+        case 'bluesky':  shareBluesky(text, m.url); break;
+        case 'x':        shareX(text, m.url); break;
+      }
+    });
+  });
+
+  /* ══════════════════════════════════════════════════════════
+     5. Text-selection popup (highlight any text to share it)
+     ══════════════════════════════════════════════════════════ */
+  const selPopup = document.getElementById('selPopup');
+  let currentSel = null; // { text, post }
+
+  function hideSelPopup() { selPopup.classList.remove('show'); currentSel = null; }
+
+  function onSelect() {
+    const sel = window.getSelection();
+    const text = sel && sel.toString().trim();
+    if (!text || text.length < 3) { hideSelPopup(); return; }
+
+    // Only inside a post body
+    let node = sel.anchorNode;
+    const postEl = node && (node.nodeType === 1 ? node : node.parentElement)?.closest('.post');
+    const inBody = node && (node.nodeType === 1 ? node : node.parentElement)?.closest('.post-body');
+    if (!postEl || !inBody) { hideSelPopup(); return; }
+
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    currentSel = { text, post: postEl };
+
+    selPopup.classList.add('show');
+    const px = window.scrollX + rect.left + rect.width / 2 - selPopup.offsetWidth / 2;
+    const py = window.scrollY + rect.top - selPopup.offsetHeight - 10;
+    selPopup.style.left = Math.max(8, px) + 'px';
+    selPopup.style.top = Math.max(8, py) + 'px';
+  }
+
+  document.addEventListener('mouseup', () => setTimeout(onSelect, 1));
+  document.addEventListener('keyup', (e) => { if (e.shiftKey || e.key === 'Shift') setTimeout(onSelect, 1); });
+  document.addEventListener('scroll', () => { if (currentSel) hideSelPopup(); }, { passive: true });
+
+  selPopup.addEventListener('mousedown', (e) => e.preventDefault()); // keep selection alive
+  selPopup.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.tool-btn'); if (!btn || !currentSel) return;
+    const m = postMeta(currentSel.post);
+    if (btn.dataset.act === 'sel-link') {
+      const url = textFragmentUrl(pageUrl(), currentSel.text) ;
+      toast((await copyText(url)) ? 'Link to the highlighted text copied.' : 'Copy failed: ' + url, 3600);
+    } else if (btn.dataset.act === 'sel-image') {
+      makeCardImage({ quote: currentSel.text, title: m.title, date: m.date, filenameHint: slug(m.title) + '-quote' });
+    }
+    hideSelPopup();
+  });
+
+  /* ══════════════════════════════════════════════════════════
+     6. Flash a post when arriving via its #id link
+     ══════════════════════════════════════════════════════════ */
+  function flashTarget() {
+    const id = decodeURIComponent(location.hash.replace(/^#/, '')).split(':~:')[0];
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el && el.classList.contains('post')) {
+      el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+    }
+  }
+  window.addEventListener('hashchange', flashTarget);
+  window.addEventListener('load', flashTarget);
 </script>
 
 </body>

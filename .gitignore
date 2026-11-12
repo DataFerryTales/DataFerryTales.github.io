@@ -18,6 +18,8 @@
 !fonts/*.woff
 !fonts/*.woff2
 !fonts/*.txt
+!js/
+!js/*.js
 !CLAUDE.md
 !*.png
 !*.jpg
