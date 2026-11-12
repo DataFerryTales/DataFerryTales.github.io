@@ -3,9 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog · Data Ferry Tales</title>
+  <title>Journal · Data Ferry Tales</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
+    /* ══════════════════════════════════════════════════════════
+       Doogie Howser, M.D. — oldschool blue-screen journal theme
+       (overrides the shared light theme for this page only)
+       ══════════════════════════════════════════════════════════ */
+
+    :root {
+      --dos-blue:   #0000aa;   /* classic DOS background blue   */
+      --dos-blue-2: #0000c4;   /* slightly brighter blue        */
+      --txt:        #e6e6ff;   /* soft white terminal text      */
+      --cyan:       #5cf0ff;   /* highlight / cursor / links     */
+      --dim:        #9a9aff;   /* muted blue-white               */
+    }
+
+    html { background: var(--dos-blue); }
+
+    body {
+      background: var(--dos-blue);
+      color: var(--txt);
+      font-family: 'VT323', 'Courier New', monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      text-shadow: 0 0 4px rgba(120,140,255,0.45);
+      min-height: 100vh;
+    }
+
+    /* CRT scanlines + subtle vignette overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 200;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0,0,0,0.12) 0px,
+          rgba(0,0,0,0.12) 1px,
+          rgba(0,0,0,0)    2px,
+          rgba(0,0,0,0)    3px
+        ),
+        radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,30,0.45) 100%);
+    }
+
     /* ── Scroll progress bar ── */
     .scroll-progress {
       position: fixed;
@@ -13,157 +58,195 @@
       left: 0;
       height: 4px;
       width: 0%;
-      background: #c9185b;
-      z-index: 100;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      z-index: 210;
       transition: width 0.08s linear;
     }
+
+    /* ── Header / nav (re-themed, overrides style.css) ── */
+    header {
+      background: var(--dos-blue);
+      border-bottom: 2px solid var(--dim);
+      padding: 14px 40px;
+    }
+
+    .site-title {
+      font-family: 'VT323', monospace;
+      color: var(--cyan);
+      font-size: 2rem;
+      letter-spacing: 1px;
+      text-shadow: 0 0 6px rgba(92,240,255,0.6);
+    }
+
+    nav a {
+      font-family: 'VT323', monospace;
+      color: var(--txt);
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+    }
+
+    nav a::before { content: ""; }
+    nav a:hover { color: var(--cyan); opacity: 1; }
+    nav a.active { color: var(--cyan); font-weight: 400; }
+    nav a.active::before { content: "> "; }
 
     /* ── Blog layout ── */
     .blog-wrap {
       max-width: 1000px;
       margin: 0 auto;
-      padding: 40px 20px 100px;
+      padding: 40px 20px 120px;
       display: grid;
-      grid-template-columns: 220px 1fr;
+      grid-template-columns: 230px 1fr;
       gap: 48px;
       align-items: start;
     }
 
-    .blog-intro {
-      grid-column: 1 / -1;
-      max-width: 720px;
-    }
+    .blog-intro { grid-column: 1 / -1; max-width: 760px; }
 
     .blog-intro h1 {
-      color: #c9185b;
-      font-size: 2.2rem;
+      color: var(--cyan);
+      font-size: 3rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 8px rgba(92,240,255,0.6);
+    }
+
+    .blog-intro p { color: var(--dim); font-size: 1.4rem; line-height: 1.4; }
+
+    /* ── Timeline nav (sticky) ── */
+    .timeline { position: sticky; top: 30px; list-style: none; }
+
+    .timeline-head {
+      color: var(--dim);
+      font-size: 1.25rem;
+      letter-spacing: 2px;
+      border-bottom: 1px dashed var(--dim);
+      padding-bottom: 6px;
       margin-bottom: 10px;
     }
 
-    .blog-intro p {
-      color: #4a3a8a;
-      font-size: 1.1rem;
-      line-height: 1.7;
-    }
-
-    /* ── Timeline nav (sticky) ── */
-    .timeline {
-      position: sticky;
-      top: 30px;
-      list-style: none;
-    }
-
-    .timeline::before {
-      content: "";
-      position: absolute;
-      left: 5px;
-      top: 6px;
-      bottom: 6px;
-      width: 2px;
-      background: #eee;
-    }
-
-    .timeline li { position: relative; padding: 6px 0 6px 24px; }
+    .timeline li { position: relative; padding: 5px 0 5px 22px; }
 
     .timeline a {
-      color: #888;
+      color: var(--dim);
       text-decoration: none;
-      font-size: 0.95rem;
-      line-height: 1.4;
+      font-size: 1.35rem;
+      line-height: 1.25;
       display: block;
       transition: color 0.15s;
     }
 
-    .timeline a:hover { color: #c9185b; }
-
     .timeline li::before {
-      content: "";
+      content: "·";
       position: absolute;
-      left: 0;
-      top: 12px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #fff;
-      border: 2px solid #ccc;
-      transition: background 0.2s, border-color 0.2s;
+      left: 2px;
+      top: 5px;
+      color: var(--dim);
+      font-size: 1.35rem;
     }
 
-    .timeline li.active::before { background: #c9185b; border-color: #c9185b; }
-    .timeline li.active a { color: #c9185b; font-weight: 700; }
+    .timeline a:hover { color: var(--cyan); }
+    .timeline li.active::before { content: ">"; color: var(--cyan); }
+    .timeline li.active a { color: var(--cyan); }
 
-    .timeline .tl-date {
-      display: block;
-      font-size: 0.78rem;
-      color: #aaa;
-    }
+    .timeline .tl-date { display: block; font-size: 1.05rem; color: #7a7aff; }
 
     /* ── Posts ── */
     .posts { min-width: 0; }
 
     .post {
       scroll-margin-top: 30px;
-      padding-bottom: 56px;
-      margin-bottom: 56px;
-      border-bottom: 1px solid #eee;
+      padding-bottom: 40px;
+      margin-bottom: 40px;
+      border-bottom: 1px dashed var(--dim);
     }
-
     .post:last-child { border-bottom: none; }
 
     .post-date {
-      color: #c9185b;
-      font-size: 0.9rem;
-      font-weight: 500;
-      letter-spacing: 0.03em;
+      color: var(--cyan);
+      font-size: 1.2rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
     }
 
     .post h2 {
-      color: #1e2060;
-      font-size: 1.8rem;
-      margin: 6px 0 20px;
-      line-height: 1.25;
+      color: var(--txt);
+      font-size: 2.2rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      margin: 2px 0 6px;
+      line-height: 1.15;
+    }
+
+    .post h2::after {
+      content: "";
+      display: block;
+      border-bottom: 1px solid var(--dim);
+      margin-top: 8px;
     }
 
     .post-body p {
-      color: #333;
-      font-size: 1.08rem;
-      line-height: 1.8;
-      margin-bottom: 18px;
+      color: var(--txt);
+      font-size: 1.45rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
     }
-
     .post-body p:last-child { margin-bottom: 0; }
 
-    .post-body a { color: #c9185b; }
+    .post-body a { color: var(--cyan); }
 
     .post-body h3 {
-      color: #1e2060;
-      font-size: 1.25rem;
-      margin: 26px 0 12px;
+      color: var(--cyan);
+      font-size: 1.6rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      margin: 22px 0 8px;
     }
 
-    .post-body ul, .post-body ol { margin: 0 0 18px 22px; }
-    .post-body li { color: #333; font-size: 1.08rem; line-height: 1.8; }
+    .post-body ul, .post-body ol { margin: 0 0 16px 24px; }
+    .post-body li { color: var(--txt); font-size: 1.45rem; line-height: 1.5; }
 
     .post-body img {
       max-width: 100%;
-      border-radius: 12px;
       display: block;
-      margin: 10px 0 20px;
+      margin: 10px 0 18px;
+      border: 2px solid var(--dim);
     }
 
     .post-body blockquote {
-      border-left: 3px solid #c9185b;
-      margin: 0 0 18px;
-      padding: 4px 0 4px 18px;
-      color: #4a3a8a;
-      font-style: italic;
+      border-left: 3px solid var(--cyan);
+      margin: 0 0 16px;
+      padding: 2px 0 2px 16px;
+      color: var(--dim);
     }
+
+    /* ── Blinking cursor (end of the newest / latest entry) ── */
+    .cursor {
+      display: inline-block;
+      width: 0.6em;
+      height: 1.1em;
+      vertical-align: text-bottom;
+      background: var(--cyan);
+      margin-left: 2px;
+      box-shadow: 0 0 8px var(--cyan);
+      animation: blink 1.05s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
 
     /* ── Responsive ── */
     @media (max-width: 760px) {
       .blog-wrap { grid-template-columns: 1fr; gap: 24px; }
       .timeline { display: none; }
+      body { font-size: 20px; }
+      header { flex-direction: column; gap: 10px; padding: 14px 20px; }
+      nav { justify-content: center; gap: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cursor { animation: none; }
     }
   </style>
 </head>
@@ -188,12 +271,13 @@
 <main class="blog-wrap">
 
   <div class="blog-intro">
-    <h1>Blog</h1>
-    <p>Notes on data visualisation, Deneb, Power BI and whatever else I'm tinkering with. Scroll down &mdash; the newest post is first.</p>
+    <h1>Journal</h1>
+    <p>&gt; Notes on data viz, Deneb, Power BI and whatever I'm tinkering with. Newest entry first.</p>
   </div>
 
   <!-- ── Timeline navigation (one <li> per post, newest first) ── -->
   <ul class="timeline" id="timeline">
+    <li class="timeline-head">ENTRIES</li>
     <li data-target="post-hello-world">
       <a href="#post-hello-world">
         Hello, world
@@ -210,9 +294,9 @@
       <div class="post-date">12 November 2026</div>
       <h2>Hello, world</h2>
       <div class="post-body">
-        <p>Welcome to the Data Ferry Tales blog. This is the very first post &mdash; mostly here so you can see how the page looks and scrolls.</p>
-        <p>The idea is simple: one long page, newest post at the top, with a little progress bar up top and a timeline down the side that highlights whichever post you're currently reading.</p>
-        <p>When I've got something new to share, it slots straight in above this one. Thanks for stopping by.</p>
+        <p>Welcome to the Data Ferry Tales journal. This is the very first entry &mdash; mostly here so you can see how the page looks and scrolls.</p>
+        <p>The idea is simple: one long page, newest entry at the top, with a progress bar along the top and a timeline down the side that lights up whichever entry you're reading.</p>
+        <p>When I've got something new to share, it slots straight in above this one. Thanks for stopping by.<span class="cursor" aria-hidden="true"></span></p>
       </div>
     </article>
     <!-- ==== POST TEMPLATE END ==== -->
@@ -222,9 +306,9 @@
 </main>
 
 <script>
-  // Scroll progress bar
+  // Scroll progress bar + active-post highlighting
   const bar = document.getElementById('scrollProgress');
-  const timelineItems = Array.from(document.querySelectorAll('#timeline li'));
+  const timelineItems = Array.from(document.querySelectorAll('#timeline li[data-target]'));
   const posts = Array.from(document.querySelectorAll('.post'));
 
   function onScroll() {
@@ -233,7 +317,6 @@
     const max = h.scrollHeight - h.clientHeight;
     bar.style.width = (max > 0 ? (scrolled / max) * 100 : 0) + '%';
 
-    // Highlight the post nearest the top of the viewport
     let activeId = posts.length ? posts[0].id : null;
     const marker = window.innerHeight * 0.35;
     for (const p of posts) {
