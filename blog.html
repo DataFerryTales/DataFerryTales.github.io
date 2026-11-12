@@ -83,6 +83,63 @@
       transition: width 0.08s linear;
     }
 
+    /* ── Per-post "rant" meter (fixed, right edge; tracks the current post) ── */
+    .rant-meter {
+      position: fixed;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: min(340px, 56vh);
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+      z-index: 120;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .rant-meter.show { opacity: 1; }
+
+    .rant-label {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      color: var(--cyan);
+      font-size: 1.05rem;
+      letter-spacing: 3px;
+      align-self: center;
+      text-shadow: 0 0 6px rgba(92,240,255,0.6);
+      white-space: nowrap;
+    }
+
+    .rant-track {
+      position: relative;
+      width: 14px;
+      border: 1px solid var(--dim);
+      background: rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+    /* blocky "loading bar" segments */
+    .rant-track::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,30,0.55) 0px, rgba(0,0,30,0.55) 2px,
+        rgba(0,0,0,0)     2px, rgba(0,0,0,0)     9px);
+      pointer-events: none;
+    }
+    .rant-fill {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%;
+      height: 0%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      transition: height 0.08s linear;
+    }
+
+    @media (max-width: 900px) { .rant-meter { display: none; } }
+
     /* ── Header / nav (re-themed, overrides style.css) ── */
     header {
       background: var(--dos-blue);
@@ -389,6 +446,12 @@
 
 <div class="scroll-progress" id="scrollProgress"></div>
 
+<!-- Per-post reading meter (shown only on posts long enough to scroll) -->
+<div class="rant-meter" id="rantMeter" aria-hidden="true">
+  <div class="rant-label" id="rantLabel">RANT 0% OVER</div>
+  <div class="rant-track"><div class="rant-fill" id="rantFill"></div></div>
+</div>
+
 <header>
   <a class="site-title" href="index.html">Data Ferry Tales</a>
   <nav>
@@ -455,7 +518,15 @@
       <div class="post-body">
         <p>After a few late nights, the Vega-Lite Builder is finally live in the Studio. The idea was simple: let people point, click and drag their way to a chart spec without hand-writing a single line of JSON.</p>
         <p>It turns out "simple" is doing a lot of work in that sentence. Encoding channels, scales, and the thousand little defaults that make a chart feel right &mdash; each one needed a sensible fallback so the preview never breaks while you tinker.</p>
-        <p>If you give it a spin and something feels off, I genuinely want to hear about it. The whole point is to lower the barrier between "I have some data" and "I have a chart I'm proud of."<span class="cursor" aria-hidden="true"></span></p>
+        <h3>Why build another chart tool at all?</h3>
+        <p>There are plenty of chart builders out there, and most of them are perfectly good. But almost all of them hide the grammar underneath. You drag a field onto "colour" and you get a chart, but you never learn <em>why</em> that choice worked, or how to undo it when it doesn't.</p>
+        <p>Vega-Lite is different because the grammar <em>is</em> the point. Every chart is a small, readable spec: here's the data, here's the mark, here's how fields map to position and colour and size. If you can read one spec, you can read them all. I wanted a builder that teaches that grammar instead of hiding it &mdash; click to build, then look at the spec it produced and actually recognise the pieces.</p>
+        <h3>The hard part: sensible defaults</h3>
+        <p>The genuinely difficult bit wasn't the UI. It was deciding what should happen when you <em>haven't</em> told it what to do yet. Pick a field for the x-axis but nothing for y? It needs to show something useful, not an error. Switch a mark from bar to line halfway through? The encodings that still make sense should survive; the ones that don't should quietly step aside.</p>
+        <p>Every one of those moments is a tiny design decision, and there are hundreds of them. Get them right and the tool feels like it's reading your mind. Get them wrong and it feels like fighting a form.</p>
+        <h3>What's next</h3>
+        <p>A few things are already on the list: saved specs you can come back to, a gallery of starting points, and a cleaner way to bring your own data in. But honestly the roadmap is going to be shaped more by what people actually trip over than by my own guesses.</p>
+        <p>So if you give it a spin and something feels off, I genuinely want to hear about it. The whole point is to lower the barrier between "I have some data" and "I have a chart I'm proud of."<span class="cursor" aria-hidden="true"></span></p>
       </div>
       <!-- Share toolbar (same markup in every post; JS wires it to this article) -->
       <div class="post-tools">
@@ -563,20 +634,46 @@
   const timelineItems = Array.from(document.querySelectorAll('#timeline li[data-target]'));
   const posts = Array.from(document.querySelectorAll('.post'));
 
+  // Per-post "rant" meter
+  const rantMeter = document.getElementById('rantMeter');
+  const rantFill  = document.getElementById('rantFill');
+  const rantLabel = document.getElementById('rantLabel');
+
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
   function onScroll() {
     const h = document.documentElement;
+    const vh = window.innerHeight;
     const scrolled = h.scrollTop;
     const max = h.scrollHeight - h.clientHeight;
     bar.style.width = (max > 0 ? (scrolled / max) * 100 : 0) + '%';
 
+    const marker = vh * 0.35;
     let activeId = posts.length ? posts[0].id : null;
-    const marker = window.innerHeight * 0.35;
     for (const p of posts) {
       if (p.getBoundingClientRect().top <= marker) activeId = p.id;
     }
     timelineItems.forEach(li => {
       li.classList.toggle('active', li.dataset.target === activeId);
     });
+
+    // ── Rant meter: progress through whichever post sits on the read line ──
+    const readLine = vh * 0.5;
+    let current = null;
+    for (const p of posts) {
+      const r = p.getBoundingClientRect();
+      if (r.top <= readLine && r.bottom >= readLine) { current = { el: p, r }; break; }
+    }
+    // Only show for posts tall enough to actually need scrolling
+    if (current && current.r.height > vh * 1.15) {
+      const p = clamp01((readLine - current.r.top) / current.r.height);
+      const pct = Math.round(p * 100);
+      rantFill.style.height = pct + '%';
+      rantLabel.textContent = 'RANT ' + pct + '% OVER';
+      rantMeter.classList.add('show');
+    } else {
+      rantMeter.classList.remove('show');
+    }
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
