@@ -13,6 +13,11 @@
 !fpl.html
 !privacy.html
 !style.css
+!fonts/
+!fonts/*.ttf
+!fonts/*.woff
+!fonts/*.woff2
+!fonts/*.txt
 !CLAUDE.md
 !*.png
 !*.jpg

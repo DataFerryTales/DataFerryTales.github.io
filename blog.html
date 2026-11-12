@@ -8,6 +8,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
+    /* Authentic IBM VGA 8x16 DOS text-mode font (SIL OFL, ansilove/BlockZone) */
+    @font-face {
+      font-family: 'BlockZone';
+      src: url('fonts/BlockZone.ttf') format('truetype');
+      font-display: swap;
+    }
+
     /* ══════════════════════════════════════════════════════════
        Doogie Howser, M.D. — oldschool blue-screen journal theme
        (overrides the shared light theme for this page only)
@@ -26,9 +33,9 @@
     body {
       background: var(--dos-blue);
       color: var(--txt);
-      font-family: 'VT323', 'Courier New', monospace;
-      font-size: 22px;
-      line-height: 1.35;
+      font-family: 'BlockZone', 'VT323', 'Courier New', monospace;
+      font-size: 18px;
+      line-height: 1.45;
       text-shadow: 0 0 4px rgba(120,140,255,0.45);
       min-height: 100vh;
     }
@@ -72,17 +79,17 @@
     }
 
     .site-title {
-      font-family: 'VT323', monospace;
+      font-family: 'BlockZone', 'VT323', monospace;
       color: var(--cyan);
-      font-size: 2rem;
+      font-size: 1.5rem;
       letter-spacing: 1px;
       text-shadow: 0 0 6px rgba(92,240,255,0.6);
     }
 
     nav a {
-      font-family: 'VT323', monospace;
+      font-family: 'BlockZone', 'VT323', monospace;
       color: var(--txt);
-      font-size: 1.5rem;
+      font-size: 1.05rem;
       font-weight: 400;
       letter-spacing: 1px;
     }
