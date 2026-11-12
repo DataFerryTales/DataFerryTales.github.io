@@ -141,6 +141,79 @@
     /* Show only when the window is wide enough to clear the 1000px content column */
     @media (max-width: 1140px) { .rant-meter { display: none; } }
 
+    /* ══════════════════════════════════════════════════════════
+       TEST: frozen footer variant — share buttons + horizontal
+       "rant" bar for the current post, always visible.
+       (Hides the inline per-post toolbars and the right-side meter.)
+       ══════════════════════════════════════════════════════════ */
+    body.footer-mode .post-tools { display: none; }
+    body.footer-mode .rant-meter { display: none; }
+
+    .share-footer {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 130;
+      display: none;                 /* shown only in footer-mode */
+      align-items: center;
+      gap: 14px 18px;
+      flex-wrap: wrap;
+      padding: 8px 20px;
+      background: var(--dos-blue);
+      border-top: 2px solid var(--cyan);
+    }
+    body.footer-mode .share-footer { display: flex; }
+
+    .sf-progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cyan);
+      font-size: 1.05rem;
+      letter-spacing: 2px;
+      white-space: nowrap;
+    }
+    .sf-track {
+      position: relative;
+      width: 180px;
+      max-width: 38vw;
+      height: 12px;
+      border: 1px solid var(--dim);
+      background: rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+    .sf-track::after {   /* blocky loading-bar segments */
+      content: "";
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        to right,
+        rgba(0,0,30,0.55) 0px, rgba(0,0,30,0.55) 2px,
+        rgba(0,0,0,0)     2px, rgba(0,0,0,0)     9px);
+      pointer-events: none;
+    }
+    .sf-fill {
+      position: absolute;
+      left: 0; top: 0; height: 100%; width: 0%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      transition: width 0.08s linear;
+    }
+    .sf-pct { min-width: 7.5em; }
+
+    .sf-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .share-footer .tool-btn { font-size: 1rem; padding: 3px 10px; }
+
+    @media (max-width: 520px) {
+      .sf-progress { font-size: 0.95rem; letter-spacing: 1px; }
+      .sf-track { width: 110px; }
+      .sf-pct { min-width: 6.5em; }
+      .share-footer .tool-btn { font-size: 0.95rem; padding: 3px 8px; }
+    }
+
     /* ── Header / nav (re-themed, overrides style.css) ── */
     header {
       background: var(--dos-blue);
@@ -443,7 +516,7 @@
     }
   </style>
 </head>
-<body>
+<body class="footer-mode">
 
 <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -626,6 +699,22 @@
 <!-- Off-screen stage where the shareable card is rendered to a PNG -->
 <div id="cardStage" aria-hidden="true"></div>
 
+<!-- TEST: frozen footer — current-post progress + share buttons -->
+<footer class="share-footer" id="shareFooter">
+  <div class="sf-progress">
+    <span>RANT</span>
+    <div class="sf-track"><div class="sf-fill" id="sfFill"></div></div>
+    <span class="sf-pct" id="sfPct">0% OVER</span>
+  </div>
+  <div class="sf-actions" id="sfActions">
+    <button class="tool-btn" data-act="link">&#128279; Copy link</button>
+    <button class="tool-btn" data-act="image">&#128247; Save image</button>
+    <button class="tool-btn" data-act="linkedin">in Share</button>
+    <button class="tool-btn" data-act="bluesky">&#9729; Bluesky</button>
+    <button class="tool-btn" data-act="x">&#120143; Post</button>
+  </div>
+</footer>
+
 <script src="js/html-to-image.js"></script>
 <script>
   /* ══════════════════════════════════════════════════════════
@@ -640,7 +729,20 @@
   const rantFill  = document.getElementById('rantFill');
   const rantLabel = document.getElementById('rantLabel');
 
+  // Frozen footer (test)
+  const shareFooter = document.getElementById('shareFooter');
+  const sfFill = document.getElementById('sfFill');
+  const sfPct  = document.getElementById('sfPct');
+  let footerPost = null;
+
   function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+  // Keep content clear of the fixed footer
+  function syncFooterPad() {
+    if (document.body.classList.contains('footer-mode') && shareFooter) {
+      document.body.style.paddingBottom = shareFooter.offsetHeight + 'px';
+    }
+  }
 
   function onScroll() {
     const h = document.documentElement;
@@ -674,6 +776,17 @@
       rantMeter.classList.add('show');
     } else {
       rantMeter.classList.remove('show');
+    }
+
+    // ── Frozen footer: current post + its horizontal progress ──
+    const fEl = (current && current.el) || document.getElementById(activeId) || posts[0];
+    if (fEl && shareFooter) {
+      footerPost = fEl;
+      const fr = fEl.getBoundingClientRect();
+      const fp = clamp01((readLine - fr.top) / fr.height);
+      const fpct = Math.round(fp * 100);
+      sfFill.style.width = fpct + '%';
+      sfPct.textContent = fpct + '% OVER';
     }
   }
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -815,25 +928,41 @@
   /* ══════════════════════════════════════════════════════════
      4. Wire up per-post toolbar buttons
      ══════════════════════════════════════════════════════════ */
+  async function shareFor(act, post) {
+    if (!post) return;
+    const m = postMeta(post);
+    const text = m.title + ' — ' + SITE;
+    switch (act) {
+      case 'link':
+        toast((await copyText(m.url)) ? 'Link copied: ' + m.url : 'Copy failed — here it is: ' + m.url);
+        break;
+      case 'image':
+        makeCardImage({ quote: postExcerpt(post), title: m.title, date: m.date, filenameHint: slug(m.title) });
+        break;
+      case 'linkedin': shareLinkedIn(m.url); break;
+      case 'bluesky':  shareBluesky(text, m.url); break;
+      case 'x':        shareX(text, m.url); break;
+    }
+  }
+
+  // Inline per-post toolbars
   document.querySelectorAll('.post-tools').forEach(bar => {
     const post = bar.closest('.post');
-    bar.addEventListener('click', async (e) => {
+    bar.addEventListener('click', (e) => {
       const btn = e.target.closest('.tool-btn'); if (!btn) return;
-      const m = postMeta(post);
-      const text = m.title + ' — ' + SITE;
-      switch (btn.dataset.act) {
-        case 'link':
-          toast((await copyText(m.url)) ? 'Link copied: ' + m.url : 'Copy failed — here it is: ' + m.url);
-          break;
-        case 'image':
-          makeCardImage({ quote: postExcerpt(post), title: m.title, date: m.date, filenameHint: slug(m.title) });
-          break;
-        case 'linkedin': shareLinkedIn(m.url); break;
-        case 'bluesky':  shareBluesky(text, m.url); break;
-        case 'x':        shareX(text, m.url); break;
-      }
+      shareFor(btn.dataset.act, post);
     });
   });
+
+  // Frozen footer toolbar — acts on the current post
+  document.getElementById('sfActions')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.tool-btn'); if (!btn) return;
+    shareFor(btn.dataset.act, footerPost || posts[0]);
+  });
+
+  window.addEventListener('load', syncFooterPad);
+  window.addEventListener('resize', syncFooterPad);
+  syncFooterPad();
 
   /* ══════════════════════════════════════════════════════════
      5. Text-selection popup (highlight any text to share it)
