@@ -138,7 +138,8 @@
       transition: height 0.08s linear;
     }
 
-    @media (max-width: 900px) { .rant-meter { display: none; } }
+    /* Show only when the window is wide enough to clear the 1000px content column */
+    @media (max-width: 1140px) { .rant-meter { display: none; } }
 
     /* ── Header / nav (re-themed, overrides style.css) ── */
     header {
