@@ -147,7 +147,6 @@
        (Hides the inline per-post toolbars and the right-side meter.)
        ══════════════════════════════════════════════════════════ */
     body.footer-mode .post-tools { display: none; }
-    body.footer-mode .rant-meter { display: none; }
 
     .share-footer {
       position: fixed;
@@ -155,13 +154,18 @@
       z-index: 130;
       display: none;                 /* shown only in footer-mode */
       align-items: center;
-      gap: 14px 18px;
+      justify-content: center;
+      gap: 10px;
       flex-wrap: wrap;
       padding: 8px 20px;
       background: var(--dos-blue);
       border-top: 2px solid var(--cyan);
     }
     body.footer-mode .share-footer { display: flex; }
+
+    /* "Pick text for image" mode */
+    body.picking { cursor: crosshair; }
+    body.picking .post-body { cursor: text; }
 
     .sf-progress {
       display: flex;
@@ -203,7 +207,7 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-left: auto;
+      justify-content: center;
     }
     .share-footer .tool-btn { font-size: 1rem; padding: 3px 10px; }
 
@@ -699,13 +703,8 @@
 <!-- Off-screen stage where the shareable card is rendered to a PNG -->
 <div id="cardStage" aria-hidden="true"></div>
 
-<!-- TEST: frozen footer — current-post progress + share buttons -->
+<!-- Frozen footer — centred share buttons (the % bar lives in the side meter) -->
 <footer class="share-footer" id="shareFooter">
-  <div class="sf-progress">
-    <span>RANT</span>
-    <div class="sf-track"><div class="sf-fill" id="sfFill"></div></div>
-    <span class="sf-pct" id="sfPct">0% OVER</span>
-  </div>
   <div class="sf-actions" id="sfActions">
     <button class="tool-btn" data-act="link">&#128279; Copy link</button>
     <button class="tool-btn" data-act="image">&#128247; Save image</button>
@@ -729,10 +728,8 @@
   const rantFill  = document.getElementById('rantFill');
   const rantLabel = document.getElementById('rantLabel');
 
-  // Frozen footer (test)
+  // Frozen footer (centred share buttons; acts on the current post)
   const shareFooter = document.getElementById('shareFooter');
-  const sfFill = document.getElementById('sfFill');
-  const sfPct  = document.getElementById('sfPct');
   let footerPost = null;
 
   function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
@@ -778,16 +775,8 @@
       rantMeter.classList.remove('show');
     }
 
-    // ── Frozen footer: current post + its horizontal progress ──
-    const fEl = (current && current.el) || document.getElementById(activeId) || posts[0];
-    if (fEl && shareFooter) {
-      footerPost = fEl;
-      const fr = fEl.getBoundingClientRect();
-      const fp = clamp01((readLine - fr.top) / fr.height);
-      const fpct = Math.round(fp * 100);
-      sfFill.style.width = fpct + '%';
-      sfPct.textContent = fpct + '% OVER';
-    }
+    // ── Frozen footer tracks the current post (its buttons act on it) ──
+    footerPost = (current && current.el) || document.getElementById(activeId) || posts[0];
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
@@ -954,9 +943,26 @@
     });
   });
 
+  // ── "Pick text to save as image" mode (armed from the footer) ──
+  let pickImageMode = false;
+  function armImagePick() {
+    pickImageMode = true;
+    document.body.classList.add('picking');
+    toast('Highlight the text you want on the image…  (Esc to cancel)', 6000);
+  }
+  function cancelImagePick(silent) {
+    pickImageMode = false;
+    document.body.classList.remove('picking');
+    if (!silent) toast('Image selection cancelled.');
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pickImageMode) cancelImagePick();
+  });
+
   // Frozen footer toolbar — acts on the current post
   document.getElementById('sfActions')?.addEventListener('click', (e) => {
     const btn = e.target.closest('.tool-btn'); if (!btn) return;
+    if (btn.dataset.act === 'image') { armImagePick(); return; }   // prompt a selection
     shareFor(btn.dataset.act, footerPost || posts[0]);
   });
 
@@ -982,6 +988,16 @@
     const postEl = node && (node.nodeType === 1 ? node : node.parentElement)?.closest('.post');
     const inBody = node && (node.nodeType === 1 ? node : node.parentElement)?.closest('.post-body');
     if (!postEl || !inBody) { hideSelPopup(); return; }
+
+    // If the footer's "Save image" armed a pick, turn this selection straight into a card
+    if (pickImageMode) {
+      const m = postMeta(postEl);
+      makeCardImage({ quote: text, title: m.title, date: m.date, filenameHint: slug(m.title) + '-quote' });
+      cancelImagePick(true);
+      hideSelPopup();
+      try { window.getSelection().removeAllRanges(); } catch (_) {}
+      return;
+    }
 
     const rect = sel.getRangeAt(0).getBoundingClientRect();
     currentSel = { text, post: postEl };
