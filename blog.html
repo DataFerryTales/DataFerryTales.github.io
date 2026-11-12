@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog · Data Ferry Tales</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Scroll progress bar ── */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0%;
+      background: #c9185b;
+      z-index: 100;
+      transition: width 0.08s linear;
+    }
+
+    /* ── Blog layout ── */
+    .blog-wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px 100px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .blog-intro {
+      grid-column: 1 / -1;
+      max-width: 720px;
+    }
+
+    .blog-intro h1 {
+      color: #c9185b;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+
+    .blog-intro p {
+      color: #4a3a8a;
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+
+    /* ── Timeline nav (sticky) ── */
+    .timeline {
+      position: sticky;
+      top: 30px;
+      list-style: none;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: #eee;
+    }
+
+    .timeline li { position: relative; padding: 6px 0 6px 24px; }
+
+    .timeline a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      display: block;
+      transition: color 0.15s;
+    }
+
+    .timeline a:hover { color: #c9185b; }
+
+    .timeline li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 12px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #ccc;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .timeline li.active::before { background: #c9185b; border-color: #c9185b; }
+    .timeline li.active a { color: #c9185b; font-weight: 700; }
+
+    .timeline .tl-date {
+      display: block;
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+
+    /* ── Posts ── */
+    .posts { min-width: 0; }
+
+    .post {
+      scroll-margin-top: 30px;
+      padding-bottom: 56px;
+      margin-bottom: 56px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .post:last-child { border-bottom: none; }
+
+    .post-date {
+      color: #c9185b;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .post h2 {
+      color: #1e2060;
+      font-size: 1.8rem;
+      margin: 6px 0 20px;
+      line-height: 1.25;
+    }
+
+    .post-body p {
+      color: #333;
+      font-size: 1.08rem;
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    .post-body p:last-child { margin-bottom: 0; }
+
+    .post-body a { color: #c9185b; }
+
+    .post-body h3 {
+      color: #1e2060;
+      font-size: 1.25rem;
+      margin: 26px 0 12px;
+    }
+
+    .post-body ul, .post-body ol { margin: 0 0 18px 22px; }
+    .post-body li { color: #333; font-size: 1.08rem; line-height: 1.8; }
+
+    .post-body img {
+      max-width: 100%;
+      border-radius: 12px;
+      display: block;
+      margin: 10px 0 20px;
+    }
+
+    .post-body blockquote {
+      border-left: 3px solid #c9185b;
+      margin: 0 0 18px;
+      padding: 4px 0 4px 18px;
+      color: #4a3a8a;
+      font-style: italic;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 760px) {
+      .blog-wrap { grid-template-columns: 1fr; gap: 24px; }
+      .timeline { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<header>
+  <a class="site-title" href="index.html">Data Ferry Tales</a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="blog.html" class="active">Blog</a>
+    <a href="cv/">CV</a>
+    <a href="https://dataferrytales.github.io/studio/vegalite.html" target="_blank">Vega-Lite Builder</a>
+    <a href="https://github.com/dataferrytales" target="_blank">GitHub</a>
+    <a href="deneb.html">Deneb</a>
+    <a href="fpl.html">FPL</a>
+    <a href="kayak-spots/">Kayak Spots</a>
+  </nav>
+</header>
+
+<main class="blog-wrap">
+
+  <div class="blog-intro">
+    <h1>Blog</h1>
+    <p>Notes on data visualisation, Deneb, Power BI and whatever else I'm tinkering with. Scroll down &mdash; the newest post is first.</p>
+  </div>
+
+  <!-- ── Timeline navigation (one <li> per post, newest first) ── -->
+  <ul class="timeline" id="timeline">
+    <li data-target="post-hello-world">
+      <a href="#post-hello-world">
+        Hello, world
+        <span class="tl-date">12 Nov 2026</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- ── Posts (newest first). To add a post, paste a new <article> at the top. ── -->
+  <div class="posts" id="posts">
+
+    <!-- ==== POST TEMPLATE START ==== -->
+    <article class="post" id="post-hello-world">
+      <div class="post-date">12 November 2026</div>
+      <h2>Hello, world</h2>
+      <div class="post-body">
+        <p>Welcome to the Data Ferry Tales blog. This is the very first post &mdash; mostly here so you can see how the page looks and scrolls.</p>
+        <p>The idea is simple: one long page, newest post at the top, with a little progress bar up top and a timeline down the side that highlights whichever post you're currently reading.</p>
+        <p>When I've got something new to share, it slots straight in above this one. Thanks for stopping by.</p>
+      </div>
+    </article>
+    <!-- ==== POST TEMPLATE END ==== -->
+
+  </div>
+
+</main>
+
+<script>
+  // Scroll progress bar
+  const bar = document.getElementById('scrollProgress');
+  const timelineItems = Array.from(document.querySelectorAll('#timeline li'));
+  const posts = Array.from(document.querySelectorAll('.post'));
+
+  function onScroll() {
+    const h = document.documentElement;
+    const scrolled = h.scrollTop;
+    const max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (scrolled / max) * 100 : 0) + '%';
+
+    // Highlight the post nearest the top of the viewport
+    let activeId = posts.length ? posts[0].id : null;
+    const marker = window.innerHeight * 0.35;
+    for (const p of posts) {
+      if (p.getBoundingClientRect().top <= marker) activeId = p.id;
+    }
+    timelineItems.forEach(li => {
+      li.classList.toggle('active', li.dataset.target === activeId);
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+</script>
+
+</body>
+</html>

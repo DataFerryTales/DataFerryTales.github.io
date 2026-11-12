@@ -1,6 +1,7 @@
 # Ignore everything except site files
 *
 !index.html
+!blog.html
 !infographic.html
 !infographic-viewer.html
 !data/
