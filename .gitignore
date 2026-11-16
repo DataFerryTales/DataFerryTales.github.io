@@ -1,6 +1,7 @@
 # Ignore everything except site files
 *
 !index.html
+!blog.html
 !infographic.html
 !infographic-viewer.html
 !data/
@@ -12,6 +13,13 @@
 !fpl.html
 !privacy.html
 !style.css
+!fonts/
+!fonts/*.ttf
+!fonts/*.woff
+!fonts/*.woff2
+!fonts/*.txt
+!js/
+!js/*.js
 !CLAUDE.md
 !*.png
 !*.jpg
