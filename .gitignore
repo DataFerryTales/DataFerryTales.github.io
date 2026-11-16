@@ -4,6 +4,9 @@
 !blog.html
 !tales/
 !tales/index.html
+!tales/img/
+!tales/img/*.png
+!tales/img/*.jpg
 !infographic.html
 !infographic-viewer.html
 !data/
