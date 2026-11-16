@@ -12,13 +12,18 @@
   <a class="site-title" href="index.html">Data Ferry Tales</a>
   <nav>
     <a href="index.html" class="active">Home</a>
-    <a href="tales/">Tales</a>
+    <a href="tales/">The Tales</a>
     <a href="cv/">CV</a>
     <a href="https://dataferrytales.github.io/studio/vegalite.html" target="_blank">Vega-Lite Builder</a>
     <a href="https://github.com/dataferrytales" target="_blank">GitHub</a>
-    <a href="deneb.html">Deneb</a>
-    <a href="fpl.html">FPL</a>
-    <a href="kayak-spots/">Kayak Spots</a>
+    <div class="nav-dropdown">
+      <button class="nav-drop-toggle" aria-haspopup="true" aria-expanded="false">Others &#9662;</button>
+      <div class="nav-drop-menu">
+        <a href="deneb.html">Deneb</a>
+        <a href="fpl.html">FPL</a>
+        <a href="kayak-spots/">Kayak Spots</a>
+      </div>
+    </div>
   </nav>
 </header>
 
@@ -60,6 +65,26 @@
     </div>
   </div>
 </main>
+
+<script>
+  // "Others" nav dropdown: click to toggle, close on outside click / Esc
+  document.querySelectorAll('.nav-dropdown').forEach(dd => {
+    const btn = dd.querySelector('.nav-drop-toggle');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = dd.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  function closeDropdowns() {
+    document.querySelectorAll('.nav-dropdown.open').forEach(dd => {
+      dd.classList.remove('open');
+      dd.querySelector('.nav-drop-toggle').setAttribute('aria-expanded', 'false');
+    });
+  }
+  document.addEventListener('click', closeDropdowns);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDropdowns(); });
+</script>
 
 </body>
 </html>
