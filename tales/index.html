@@ -565,7 +565,7 @@
   <div class="posts" id="posts">
 
     <!-- ==== POST TEMPLATE START (newest entry — keep the cursor on this one) ==== -->
-    <article class="post" id="post-ai-in-private">
+    <article class="post" id="post-ai-in-private" data-slug="ai-in-private">
       <div class="post-date">16 November 2026</div>
       <h2>The AI conversation we keep having in private</h2>
       <div class="post-body">
@@ -716,6 +716,17 @@
     };
   }
 
+  // The URL to SHARE for a post. Posts with a data-slug have a per-post share
+  // page (tales/p/<slug>/) that carries that post's own card image + title and
+  // redirects a reader to the in-page anchor. Without a slug, fall back to the
+  // anchor link.
+  function postShareUrl(post) {
+    const slug = post.dataset.slug;
+    if (!slug) return postMeta(post).url;
+    const dir = location.pathname.replace(/[^/]*$/, '');   // -> '/tales/'
+    return location.origin + dir + 'p/' + slug + '/';
+  }
+
   async function copyText(text) {
     try {
       await navigator.clipboard.writeText(text);
@@ -823,17 +834,18 @@
   async function shareFor(act, post) {
     if (!post) return;
     const m = postMeta(post);
+    const shareUrl = postShareUrl(post);   // per-post page for rich link cards
     const text = m.title + ' — ' + SITE;
     switch (act) {
       case 'link':
-        toast((await copyText(m.url)) ? 'Link copied: ' + m.url : 'Copy failed — here it is: ' + m.url);
+        toast((await copyText(shareUrl)) ? 'Link copied: ' + shareUrl : 'Copy failed — here it is: ' + shareUrl);
         break;
       case 'image':
         makeCardImage({ quote: postExcerpt(post), title: m.title, date: m.date, filenameHint: slug(m.title) });
         break;
-      case 'linkedin': shareLinkedIn(m.url); break;
-      case 'bluesky':  shareBluesky(text, m.url); break;
-      case 'x':        shareX(text, m.url); break;
+      case 'linkedin': shareLinkedIn(shareUrl); break;
+      case 'bluesky':  shareBluesky(text, shareUrl); break;
+      case 'x':        shareX(text, shareUrl); break;
     }
   }
 

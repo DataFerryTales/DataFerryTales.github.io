@@ -7,6 +7,10 @@
 !tales/img/
 !tales/img/*.png
 !tales/img/*.jpg
+!tales/img/cards/
+!tales/img/cards/*.png
+!tales/p/
+!tales/p/**/
 !infographic.html
 !infographic-viewer.html
 !data/
