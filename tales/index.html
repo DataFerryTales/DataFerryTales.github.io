@@ -657,7 +657,7 @@
       li.classList.toggle('active', li.dataset.target === activeId);
     });
 
-    // ── Rant meter: progress through whichever post sits on the read line ──
+    // ── Rant meter: true reading progress through the current post ──
     const readLine = vh * 0.5;
     let current = null;
     for (const p of posts) {
@@ -665,12 +665,15 @@
       if (r.top <= readLine && r.bottom >= readLine) { current = { el: p, r }; break; }
     }
     // Only show for posts tall enough to actually need scrolling
-    if (current && current.r.height > vh * 1.15) {
-      const p = clamp01((readLine - current.r.top) / current.r.height);
+    const scrollable = current ? current.r.height - vh : 0;
+    if (current && scrollable > vh * 0.15) {
+      // 0% when the post's top is at the viewport top, 100% at its bottom
+      const p = clamp01(-current.r.top / scrollable);
       const pct = Math.round(p * 100);
       rantFill.style.height = pct + '%';
       rantLabel.textContent = 'RANT ' + pct + '% OVER';
-      rantMeter.classList.add('show');
+      // Show while reading; hide once you've reached the end
+      rantMeter.classList.toggle('show', p < 0.999);
     } else {
       rantMeter.classList.remove('show');
     }
