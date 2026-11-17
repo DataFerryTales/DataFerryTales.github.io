@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Blue Screen Photo Lab · Data Ferry Tales</title>
+<meta name="description" content="Turn a photo into a DOS text-mode rendering — rebuilt from dithered blocks or actual characters, like an image that was never really an image.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+<style>
+  :root {
+    --dos-blue:   #0000aa;
+    --panel:      #00008e;
+    --panel-2:    #000070;
+    --ink:        #e6e6ff;
+    --dim:        #9a9aff;
+    --cyan:       #5cf0ff;
+    --line:       #4a4ad6;
+    --font-term:  'VT323', 'Courier New', monospace;
+    --font-ui:    ui-monospace, 'Cascadia Mono', 'Consolas', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--dos-blue);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-block: 22px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  .back { display: inline-block; color: var(--dim); text-decoration: none; font-size: 0.85rem; margin-bottom: 14px; }
+  .back:hover { color: var(--cyan); }
+
+  header { margin-bottom: 20px; }
+  h1 {
+    font-family: var(--font-term);
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+    letter-spacing: 2px;
+    color: var(--cyan);
+    margin: 0;
+    text-shadow: 0 0 10px rgba(92,240,255,0.45);
+    text-wrap: balance;
+  }
+  .sub { color: var(--dim); font-size: 0.95rem; margin-top: 4px; max-width: 60ch; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    min-width: 0;
+  }
+
+  .controls { display: flex; flex-direction: column; gap: 16px; }
+
+  .dropzone {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; text-align: center;
+    border: 1px dashed var(--dim); border-radius: 10px;
+    padding: 18px 12px; cursor: pointer;
+    color: var(--dim); font-size: 0.9rem;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .dropzone:hover, .dropzone.drag { border-color: var(--cyan); color: var(--cyan); background: var(--panel-2); }
+  .dropzone b { color: var(--ink); font-size: 1rem; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field > label {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--dim);
+    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  }
+  .field .val { color: var(--cyan); font-family: var(--font-term); font-size: 1.1rem; letter-spacing: 1px; }
+
+  input[type="range"] { width: 100%; accent-color: var(--cyan); margin: 0; }
+
+  .seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .seg button, .btn {
+    font-family: var(--font-ui); font-size: 0.82rem;
+    color: var(--ink); background: var(--panel-2);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 6px; cursor: pointer; transition: all .12s;
+  }
+  .seg button:hover, .btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .seg button[aria-pressed="true"] { background: var(--cyan); color: var(--dos-blue); border-color: var(--cyan); font-weight: 700; }
+
+  select {
+    font-family: var(--font-ui); font-size: 0.9rem; color: var(--ink);
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 10px; width: 100%;
+  }
+
+  .checks { display: flex; gap: 18px; flex-wrap: wrap; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--ink); cursor: pointer; }
+  .check input { accent-color: var(--cyan); width: 16px; height: 16px; }
+
+  .stage { display: flex; flex-direction: column; gap: 14px; }
+  .screen {
+    position: relative; width: 100%;
+    background: #000; border: 1px solid var(--line); border-radius: 10px;
+    overflow: auto; min-height: 240px;
+    display: flex; align-items: center; justify-content: center; padding: 10px;
+  }
+  canvas#out { max-width: 100%; height: auto; image-rendering: pixelated; display: block; }
+
+  .stage-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .note { color: var(--dim); font-size: 0.8rem; min-width: 0; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--line); color: var(--ink); }
+
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <a class="back" href="../index.html">&larr; Data Ferry Tales</a>
+  <header>
+    <h1>BLUE SCREEN PHOTO LAB</h1>
+    <p class="sub">Turn a photo into a DOS text-mode rendering &mdash; the picture rebuilt from dithered blocks or actual characters, like an image that was never really an image.</p>
+  </header>
+
+  <div class="layout">
+    <section class="panel controls">
+      <label class="dropzone" id="drop">
+        <b>Drop a photo here</b>
+        <span>or click to choose &mdash; stays on your device</span>
+        <input type="file" id="file" accept="image/*" hidden>
+      </label>
+      <button class="btn" id="demo" type="button">&#9632; Load demo scene</button>
+
+      <div class="field">
+        <label for="detail">Detail <span class="val" id="detailVal">120</span></label>
+        <input type="range" id="detail" min="40" max="200" step="4" value="120">
+      </div>
+
+      <div class="field">
+        <label>Render mode</label>
+        <div class="seg" id="mode">
+          <button type="button" data-mode="blocks" aria-pressed="true">Blocks</button>
+          <button type="button" data-mode="ascii">ASCII</button>
+          <button type="button" data-mode="asciicol">ASCII+col</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="palette">Palette</label>
+        <select id="palette">
+          <option value="blue" selected>DOS Blue</option>
+          <option value="cyan">Terminal Cyan</option>
+          <option value="green">Phosphor Green</option>
+          <option value="amber">Amber CRT</option>
+          <option value="mono">Mono Grey</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="bright">Brightness <span class="val" id="brightVal">0</span></label>
+        <input type="range" id="bright" min="-40" max="40" step="1" value="0">
+      </div>
+
+      <div class="field">
+        <label for="contrast">Contrast <span class="val" id="contrastVal">1.2</span></label>
+        <input type="range" id="contrast" min="50" max="260" step="1" value="120">
+      </div>
+
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="invert"> Invert</label>
+        <label class="check"><input type="checkbox" id="scan" checked> Scanlines</label>
+      </div>
+    </section>
+
+    <section class="panel stage">
+      <div class="screen"><canvas id="out" width="600" height="400"></canvas></div>
+      <div class="stage-actions">
+        <button class="btn" id="copyimg" type="button">Copy image</button>
+        <button class="btn" id="copy" type="button" disabled>Copy as text</button>
+        <span class="note" id="note">Copy the image, or right-click it to save.</span>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const out = $('out'), octx = out.getContext('2d');
+
+  const PALETTES = {
+    blue:  { bg:'#0000aa', fg:'#8ff2ff', levels:['#0000aa','#1a2fc0','#3a5fe0','#5c8cff','#79c6ff','#b6ecff','#ffffff'] },
+    cyan:  { bg:'#001b22', fg:'#49f0ff', levels:['#001b22','#044049','#0a6b78','#17a7b8','#39d6e6','#9bf3fb','#ffffff'] },
+    green: { bg:'#001a00', fg:'#39ff14', levels:['#001a00','#0a3a0a','#1f7a1f','#39c339','#73e673','#bdffbd','#ffffff'] },
+    amber: { bg:'#1a0d00', fg:'#ffb000', levels:['#1a0d00','#3a2600','#7a4f00','#d38a00','#ffb347','#ffe0a3','#fff6e6'] },
+    mono:  { bg:'#0a0a0a', fg:'#f0f0f0', levels:['#0a0a0a','#2a2a2a','#4f4f4f','#787878','#a6a6a6','#d4d4d4','#ffffff'] },
+  };
+  const ASCII_RAMP = " .:-=+*#%@";
+  const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]].map(r => r.map(v => (v + 0.5) / 16));
+
+  let srcCanvas = null;
+  let lastText = '';
+
+  const state = {
+    get detail(){ return +$('detail').value; },
+    get mode(){ return document.querySelector('#mode [aria-pressed="true"]').dataset.mode; },
+    get palette(){ return PALETTES[$('palette').value]; },
+    get bright(){ return +$('bright').value / 100; },
+    get contrast(){ return +$('contrast').value / 100; },
+    get invert(){ return $('invert').checked; },
+    get scan(){ return $('scan').checked; },
+  };
+
+  function setSrc(image){
+    const cap = 1000;
+    let w = image.width, h = image.height;
+    const s = Math.min(1, cap / Math.max(w, h));
+    w = Math.max(1, Math.round(w * s)); h = Math.max(1, Math.round(h * s));
+    srcCanvas = document.createElement('canvas');
+    srcCanvas.width = w; srcCanvas.height = h;
+    srcCanvas.getContext('2d').drawImage(image, 0, 0, w, h);
+    render();
+  }
+
+  function loadFromFile(file){
+    if (!file || !file.type.startsWith('image/')) return;
+    const r = new FileReader();
+    r.onload = () => { const img = new Image(); img.onload = () => setSrc(img); img.src = r.result; };
+    r.readAsDataURL(file);
+  }
+
+  function buildDemo(){
+    const c = document.createElement('canvas'); c.width = 800; c.height = 560;
+    const x = c.getContext('2d');
+    const sky = x.createLinearGradient(0, 0, 0, 560);
+    sky.addColorStop(0, '#0b1030'); sky.addColorStop(0.55, '#5a3a66'); sky.addColorStop(0.75, '#e0825a'); sky.addColorStop(1, '#f6c17a');
+    x.fillStyle = sky; x.fillRect(0, 0, 800, 560);
+    const sun = x.createRadialGradient(560, 300, 10, 560, 300, 150);
+    sun.addColorStop(0, '#fff8e8'); sun.addColorStop(0.4, '#ffd98a'); sun.addColorStop(1, 'rgba(255,200,120,0)');
+    x.fillStyle = sun; x.beginPath(); x.arc(560, 300, 150, 0, 7); x.fill();
+    const hill = (base, col) => { x.fillStyle = col; x.beginPath(); x.moveTo(0, 560);
+      for (let i = 0; i <= 800; i += 20){ x.lineTo(i, base + Math.sin(i / 90 + base) * 34 + Math.cos(i / 37) * 10); }
+      x.lineTo(800, 560); x.closePath(); x.fill(); };
+    hill(360, '#3a2046'); hill(410, '#241533'); hill(470, '#120a1c');
+    x.strokeStyle = '#0a0612'; x.lineWidth = 3;
+    [[150,150],[200,135],[250,160]].forEach(([bx,by]) => { x.beginPath(); x.moveTo(bx, by); x.quadraticCurveTo(bx+12, by-10, bx+24, by); x.quadraticCurveTo(bx+36, by-10, bx+48, by); x.stroke(); });
+    return c;
+  }
+
+  let raf = 0;
+  function render(){
+    if (!srcCanvas) return;
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(draw);
+  }
+
+  function draw(){
+    const pal = state.palette, mode = state.mode;
+    const cols = state.detail;
+    const aspect = srcCanvas.height / srcCanvas.width;
+    const charSquash = (mode === 'blocks') ? 1 : 0.5;
+    const rows = Math.max(1, Math.round(cols * aspect * charSquash));
+
+    const tmp = document.createElement('canvas'); tmp.width = cols; tmp.height = rows;
+    const tctx = tmp.getContext('2d');
+    tctx.drawImage(srcCanvas, 0, 0, cols, rows);
+    const data = tctx.getImageData(0, 0, cols, rows).data;
+
+    const L = new Float32Array(cols * rows);
+    const b = state.bright, k = state.contrast, inv = state.invert;
+    for (let i = 0; i < cols * rows; i++){
+      const p = i * 4;
+      let l = (0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2]) / 255;
+      l = (l - 0.5) * k + 0.5 + b;
+      if (inv) l = 1 - l;
+      L[i] = l < 0 ? 0 : l > 1 ? 1 : l;
+    }
+
+    const levels = pal.levels, nL = levels.length;
+    if (mode === 'blocks'){
+      const cell = Math.max(3, Math.round(820 / cols));
+      out.width = cols * cell; out.height = rows * cell;
+      octx.fillStyle = pal.bg; octx.fillRect(0, 0, out.width, out.height);
+      for (let y = 0; y < rows; y++){
+        for (let xx = 0; xx < cols; xx++){
+          const t = BAYER[y & 3][xx & 3];
+          let idx = Math.floor(L[y * cols + xx] * (nL - 1) + (t - 0.5));
+          idx = idx < 0 ? 0 : idx > nL - 1 ? nL - 1 : idx;
+          if (idx === 0) continue;
+          octx.fillStyle = levels[idx];
+          octx.fillRect(xx * cell, y * cell, cell, cell);
+        }
+      }
+      lastText = '';
+      $('copy').disabled = true;
+    } else {
+      const cw = 9, ch = 16;
+      out.width = cols * cw; out.height = rows * ch;
+      octx.fillStyle = pal.bg; octx.fillRect(0, 0, out.width, out.height);
+      octx.font = ch + "px 'VT323', monospace";
+      octx.textAlign = 'center'; octx.textBaseline = 'middle';
+      const colour = (mode === 'asciicol');
+      let text = '';
+      for (let y = 0; y < rows; y++){
+        for (let xx = 0; xx < cols; xx++){
+          const l = L[y * cols + xx];
+          const ci = Math.round(l * (ASCII_RAMP.length - 1));
+          const chr = ASCII_RAMP[ci];
+          text += chr;
+          if (chr !== ' '){
+            octx.fillStyle = colour ? levels[Math.max(1, Math.round(l * (nL - 1)))] : pal.fg;
+            octx.fillText(chr, xx * cw + cw / 2, y * ch + ch / 2);
+          }
+        }
+        text += '\n';
+      }
+      lastText = text;
+      $('copy').disabled = false;
+    }
+
+    if (state.scan) applyScanlines();
+  }
+
+  function applyScanlines(){
+    const h = out.height;
+    octx.save();
+    octx.globalAlpha = 0.18; octx.fillStyle = '#000';
+    for (let y = 0; y < h; y += 3) octx.fillRect(0, y, out.width, 1);
+    octx.restore();
+  }
+
+  ['detail','bright','contrast','palette','invert','scan'].forEach(id => {
+    $(id).addEventListener('input', () => { syncLabels(); render(); });
+  });
+  function syncLabels(){
+    $('detailVal').textContent = $('detail').value;
+    $('brightVal').textContent = (+$('bright').value > 0 ? '+' : '') + $('bright').value;
+    $('contrastVal').textContent = (+$('contrast').value / 100).toFixed(2);
+  }
+
+  document.querySelectorAll('#mode button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#mode button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      render();
+    });
+  });
+
+  const drop = $('drop'), fileInput = $('file');
+  fileInput.addEventListener('change', e => loadFromFile(e.target.files[0]));
+  ['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+  drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) loadFromFile(e.dataTransfer.files[0]); });
+
+  $('demo').addEventListener('click', () => { srcCanvas = buildDemo(); render(); });
+
+  $('copyimg').addEventListener('click', () => {
+    out.toBlob(async (blob) => {
+      if (!blob) { flash('Could not read the image'); return; }
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        flash('Image copied to clipboard');
+      } catch(_) { flash('Copy blocked — right-click the picture to save'); }
+    }, 'image/png');
+  });
+
+  $('copy').addEventListener('click', async () => {
+    if (!lastText) return;
+    try { await navigator.clipboard.writeText(lastText); flash('Copied ' + lastText.split('\n').length + ' lines'); }
+    catch(_) { flash('Copy blocked — select the picture instead'); }
+  });
+  let flashTimer;
+  function flash(msg){ const n = $('note'); const prev = n.dataset.base || n.textContent;
+    n.dataset.base = prev; n.textContent = msg; clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => { n.textContent = n.dataset.base; }, 2200); }
+
+  syncLabels();
+  srcCanvas = buildDemo();
+  render();
+</script>
+
+</body>
+</html>
