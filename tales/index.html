@@ -248,6 +248,52 @@
     nav a.active { color: var(--cyan); font-weight: 400; }
     nav a.active::before { content: "> "; }
 
+    /* ── "Others" dropdown — DOS theme (overrides the light homepage styles) ── */
+    .nav-dropdown { position: relative; display: inline-block; }
+    .nav-drop-toggle {
+      font-family: 'BlockZone', 'VT323', monospace;
+      font-size: 1.05rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: var(--txt);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    .nav-drop-toggle:hover,
+    .nav-dropdown.open .nav-drop-toggle { color: var(--cyan); opacity: 1; }
+
+    .nav-drop-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      display: none;
+      flex-direction: column;
+      min-width: 170px;
+      background: var(--dos-blue);
+      border: 1px solid var(--cyan);
+      border-radius: 0;
+      padding: 6px;
+      box-shadow: none;
+      z-index: 50;
+    }
+    .nav-dropdown.open .nav-drop-menu,
+    .nav-dropdown:focus-within .nav-drop-menu { display: flex; }
+
+    .nav-drop-menu a {
+      font-family: 'BlockZone', 'VT323', monospace;
+      font-size: 1.05rem;
+      letter-spacing: 1px;
+      color: var(--txt);
+      padding: 6px 10px;
+      border-radius: 0;
+      white-space: nowrap;
+    }
+    .nav-drop-menu a::before { content: ""; }
+    .nav-drop-menu a:hover { background: none; color: var(--cyan); opacity: 1; }
+    .nav-drop-menu a:hover::before { content: "> "; }
+
     /* ── Blog layout ── */
     .blog-wrap {
       max-width: 1000px;
