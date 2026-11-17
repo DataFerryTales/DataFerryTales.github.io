@@ -11,6 +11,8 @@
 !tales/img/cards/*.png
 !tales/p/
 !tales/p/**/
+!tales/posts/
+!tales/posts/*.txt
 !infographic.html
 !infographic-viewer.html
 !data/
