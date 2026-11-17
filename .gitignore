@@ -20,6 +20,8 @@
 !data/*.csv
 !cv/
 !cv/index.html
+!lab/
+!lab/index.html
 !deneb.html
 !fpl.html
 !privacy.html
