@@ -30,7 +30,7 @@
     }
 
     /* ══════════════════════════════════════════════════════════
-       Doogie Howser, M.D. — oldschool blue-screen journal theme
+       Doogie Howser, M.D. — oldschool blue-screen diary theme
        (overrides the shared light theme for this page only)
        ══════════════════════════════════════════════════════════ */
 
@@ -632,7 +632,7 @@
         <p>Let me be very clear: nobody knows what the fuck is going on right now. Unless a person is literally a product owner, you can take their opinion on the direction a product is headed with the smallest possible pinch of salt.</p>
         <p>We&rsquo;re currently living through the Wild West of product development. People are losing their minds at their ability to create what was previously unimaginable at a speed that was previously impossible. Fabric now has more views than your report has viewers! And in the world of independent vibe coders we&rsquo;re in a period in which people decide they don&rsquo;t want to pay for any product anymore, so instead they just clone it. Apparently fuck copyright; Wild West, baby!</p>
         <p>I don&rsquo;t want to be accused of taking joy in people being wrong, but that doesn&rsquo;t stop it being funny that a certain corner of LinkedIn decided that Power BI Desktop was &lsquo;cooked&rsquo;, and twenty-four hours later it got an update that puts it at the centre of one of Fabric&rsquo;s newest and most visible products.</p>
-        <p>And yet people are still so confident in loudly expressing their opinions on these matters as facts. Product development and coding have gotten so much faster in such a short period of time that humans are still playing catch-up to the reality that you can no longer see things coming: they&rsquo;re just there. And even worse, it happens so quickly that people can still remember what you said.<span class="cursor" aria-hidden="true"></span></p>
+        <p>And yet people are still so confident in loudly expressing their opinions on these matters as facts. Product development and coding have become so much faster in such a short period of time that humans are still playing catch-up to the reality that you can no longer see things coming: they&rsquo;re just there. And even worse, it happens so quickly that people can still remember what you said.<span class="cursor" aria-hidden="true"></span></p>
         <img src="img/wildwest.png" alt="A photo rendered in the blog's blue-screen style">
       </div>
       <div class="post-tools">
@@ -883,7 +883,7 @@
       });
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = 'ferrytales-' + (filenameHint || 'journal') + '.png';
+      a.download = 'ferrytales-' + (filenameHint || 'tale') + '.png';
       document.body.appendChild(a); a.click(); a.remove();
       toast('Image saved — attach it to your LinkedIn / Bluesky post.');
     } catch (e) {
@@ -900,7 +900,7 @@
   }
 
   function slug(s) {
-    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'journal';
+    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'tale';
   }
 
   function postExcerpt(post, max = 280) {

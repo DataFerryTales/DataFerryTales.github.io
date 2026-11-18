@@ -9,7 +9,7 @@ We're currently living through the Wild West of product development. People are 
 
 I don't want to be accused of taking joy in people being wrong, but that doesn't stop it being funny that a certain corner of LinkedIn decided that Power BI Desktop was 'cooked', and twenty-four hours later it got an update that puts it at the centre of one of Fabric's newest and most visible products.
 
-And yet people are still so confident in loudly expressing their opinions on these matters as facts. Product development and coding have gotten so much faster in such a short period of time that humans are still playing catch-up to the reality that you can no longer see things coming: they're just there. And even worse, it happens so quickly that people can still remember what you said.
+And yet people are still so confident in loudly expressing their opinions on these matters as facts. Product development and coding have become so much faster in such a short period of time that humans are still playing catch-up to the reality that you can no longer see things coming: they're just there. And even worse, it happens so quickly that people can still remember what you said.
 
 
 [image: wildwest.png | A photo rendered in the blog's blue-screen style]
