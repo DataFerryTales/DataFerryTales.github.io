@@ -1,0 +1,15 @@
+title: Wild West, Baby
+date: 19 November 2026
+slug: wild-west-baby
+
+
+Let me be very clear: nobody knows what the fuck is going on right now. Unless a person is literally a product owner, you can take their opinion on the direction a product is headed with the smallest possible pinch of salt. 
+
+We're currently living through the Wild West of product development. People are losing their minds at their ability to create what was previously unimaginable at a speed that was previously impossible. Fabric now has more views than your report has viewers! And in the world of independent vibe coders we're in a period in which people decide they don't want to pay for any product anymore, so instead they just clone it. Apparently fuck copyright; Wild West, baby!
+
+I don't want to be accused of taking joy in people being wrong, but that doesn't stop it being funny that a certain corner of LinkedIn decided that Power BI Desktop was 'cooked', and twenty-four hours later it got an update that puts it at the centre of one of Fabric's newest and most visible products.
+
+And yet people are still so confident in loudly expressing their opinions on these matters as facts. Product development and coding have become so much faster in such a short period of time that humans are still playing catch-up to the reality that you can no longer see things coming: they're just there. And even worse, it happens so quickly that people can still remember what you said.
+
+
+[image: wildwest.png | A photo rendered in the blog's blue-screen style]

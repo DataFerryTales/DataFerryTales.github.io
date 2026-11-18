@@ -30,7 +30,7 @@
     }
 
     /* ══════════════════════════════════════════════════════════
-       Doogie Howser, M.D. — oldschool blue-screen journal theme
+       Doogie Howser, M.D. — oldschool blue-screen diary theme
        (overrides the shared light theme for this page only)
        ══════════════════════════════════════════════════════════ */
 
@@ -607,6 +607,12 @@
   <!-- ── Timeline navigation (one <li> per post, newest first) ── -->
   <ul class="timeline" id="timeline">
     <li class="timeline-head">ENTRIES</li>
+    <li data-target="post-wild-west-baby">
+      <a href="#post-wild-west-baby">
+        Wild West, Baby
+        <span class="tl-date">19 Nov 2026</span>
+      </a>
+    </li>
     <li data-target="post-ai-in-private">
       <a href="#post-ai-in-private">
         The AI conversation we keep having in private
@@ -618,7 +624,27 @@
   <!-- ── Posts (newest first). To add a post, paste a new <article> at the top. ── -->
   <div class="posts" id="posts">
 
-    <!-- ==== POST TEMPLATE START (newest entry — keep the cursor on this one) ==== -->
+    <!-- ==== Newest entry — keep the cursor on this one ==== -->
+    <article class="post" id="post-wild-west-baby" data-slug="wild-west-baby">
+      <div class="post-date">19 November 2026</div>
+      <h2>Wild West, Baby</h2>
+      <div class="post-body">
+        <p>Let me be very clear: nobody knows what the fuck is going on right now. Unless a person is literally a product owner, you can take their opinion on the direction a product is headed with the smallest possible pinch of salt.</p>
+        <p>We&rsquo;re currently living through the Wild West of product development. People are losing their minds at their ability to create what was previously unimaginable at a speed that was previously impossible. Fabric now has more views than your report has viewers! And in the world of independent vibe coders we&rsquo;re in a period in which people decide they don&rsquo;t want to pay for any product anymore, so instead they just clone it. Apparently fuck copyright; Wild West, baby!</p>
+        <p>I don&rsquo;t want to be accused of taking joy in people being wrong, but that doesn&rsquo;t stop it being funny that a certain corner of LinkedIn decided that Power BI Desktop was &lsquo;cooked&rsquo;, and twenty-four hours later it got an update that puts it at the centre of one of Fabric&rsquo;s newest and most visible products.</p>
+        <p>And yet people are still so confident in loudly expressing their opinions on these matters as facts. Product development and coding have become so much faster in such a short period of time that humans are still playing catch-up to the reality that you can no longer see things coming: they&rsquo;re just there. And even worse, it happens so quickly that people can still remember what you said.<span class="cursor" aria-hidden="true"></span></p>
+        <img src="img/wildwest.png" alt="A photo rendered in the blog's blue-screen style">
+      </div>
+      <div class="post-tools">
+        <button class="tool-btn" data-act="link">&#128279; Copy link</button>
+        <button class="tool-btn" data-act="image">&#128247; Save image</button>
+        <button class="tool-btn" data-act="linkedin">in Share</button>
+        <button class="tool-btn" data-act="bluesky">&#9729; Bluesky</button>
+        <button class="tool-btn" data-act="x">&#120143; Post</button>
+      </div>
+    </article>
+
+    <!-- ==== POST TEMPLATE START ==== -->
     <article class="post" id="post-ai-in-private" data-slug="ai-in-private">
       <div class="post-date">16 November 2026</div>
       <h2>The AI conversation we keep having in private</h2>
@@ -627,7 +653,7 @@
         <p>The conversations are far more frequently had in private circles. I consider myself lucky to know people who <em>are</em> capable still of critical thinking, who can see the dangers AI poses and the wonders it could potentially achieve. The industries it could help revolutionise with a massive benefit to humanity, and those it could devastate.</p>
         <p>A concern for me is these conversations are intentionally held in almost exclusively private circles, largely for fear of one&rsquo;s perception within an industry. Artists backing AI can be vilified for supporting it, whilst those in tech are seen as backward or archaic for not fully embracing AI into our every workflow. Analytics is a discipline in which automation and speed are <em>highly</em> regarded. Removing manual effort to improve efficiency is a huge amount of the work we do in creating analytical environments. So to not fully accept or use a tool which can do these things could sit badly with a current or potential employer.</p>
         <p>We have always worked in the frame of mind that we <em>must</em> stay up to date. We must learn to adapt, to learn the tools that are made available to us, or be left behind. This feels somewhat ironic when the very tools we are handed are those which we are told could make us the manual effort which must be removed. For how many of us is it true that using AI takes away a reasonable sized chunk of the work that we enjoyed? And that what we are left with is almost an entirely different job we had never envisaged ourselves doing. This also brings with it mental health concerns for those who feel potentially trapped in a job from which they very suddenly get no pleasure or satisfaction.</p>
-        <p>This is not to say we can&rsquo;t adapt. Moving from managing pipelines to managing agents is no huge ask. But the relentless pace of AI advancement brings near-constant uncertainty. From one month to the next, a new model or development seems to remove the need for tool X, before anyone has a real idea of how it fits into a business environment. That is why the online hype cycle of AI &lsquo;hot takes&rsquo; is good only for clickbait, and should be ignored by anyone with a genuine interest in how these tools develop, in analytics and in every other industry AI touches.<span class="cursor" aria-hidden="true"></span></p>
+        <p>This is not to say we can&rsquo;t adapt. Moving from managing pipelines to managing agents is no huge ask. But the relentless pace of AI advancement brings near-constant uncertainty. From one month to the next, a new model or development seems to remove the need for tool X, before anyone has a real idea of how it fits into a business environment. That is why the online hype cycle of AI &lsquo;hot takes&rsquo; is good only for clickbait, and should be ignored by anyone with a genuine interest in how these tools develop, in analytics and in every other industry AI touches.</p>
         <img src="img/ai-in-private.png" alt="A photo rendered in the blog's blue-screen style">
       </div>
       <!-- Share toolbar (same markup in every post; JS wires it to this article) -->
@@ -857,7 +883,7 @@
       });
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = 'ferrytales-' + (filenameHint || 'journal') + '.png';
+      a.download = 'ferrytales-' + (filenameHint || 'tale') + '.png';
       document.body.appendChild(a); a.click(); a.remove();
       toast('Image saved — attach it to your LinkedIn / Bluesky post.');
     } catch (e) {
@@ -874,7 +900,7 @@
   }
 
   function slug(s) {
-    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'journal';
+    return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'tale';
   }
 
   function postExcerpt(post, max = 280) {
