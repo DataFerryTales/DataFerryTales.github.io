@@ -5,7 +5,7 @@ slug: wild-west-baby
 
 Let me be very clear: nobody knows what the fuck is going on right now. Unless a person is literally a product owner, you can take their opinion on the direction a product is headed with the smallest possible pinch of salt. 
 
-We're currently living through the Wild West of product development. People are losing their minds at their ability to create what was previously unimaginable at a speed that was previously impossible. Fabric now has more views than your report has viewers! And in the world of independent vibe coders we're in a period in which people decide they don't want to pay for any product anymore, so instead they just clone it. Apparently fuck copyright; Wild West, baby!
+We're currently living through the Wild West of product development. People are losing their minds at their ability to create what was previously unimaginable at a speed that was previously impossible. Fabric now has more views than your report has viewers! And in the world of independent vibe coders we're in a period in which if someone decides they don't want to pay for software anymore, they just clone it. Apparently fuck copyright; Wild West, baby!
 
 I don't want to be accused of taking joy in people being wrong, but that doesn't stop it being funny that a certain corner of LinkedIn decided that Power BI Desktop was 'cooked', and twenty-four hours later it got an update that puts it at the centre of one of Fabric's newest and most visible products.
 
